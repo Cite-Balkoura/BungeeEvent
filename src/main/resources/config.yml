@@ -1,1 +1,23 @@
-mongodb:
+core:
+  prefix: "[EVENT]"
+  event: "EventDefault"
+  debug-exceptions: false
+#
+
+data:
+  mongo:
+    host : "127.0.0.1"
+    port : 27017,
+    user : "minecraft"
+    password : "admin"
+    db : "admin"
+    databases : ["master"]
+  rabbitMQ: {
+    host : "127.0.0.1"
+    port : 5672
+    user : "minecraft"
+    password : "admin"
+    exchange : "minecraft"
+    queue : "sub-queue"
+    routingKey : "pub-routingKey"
+#

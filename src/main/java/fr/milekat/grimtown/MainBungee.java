@@ -1,41 +1,52 @@
 package fr.milekat.grimtown;
 
+import dev.morphia.Datastore;
+import fr.milekat.grimtown.event.ThisEvent;
+import fr.milekat.grimtown.utils.ConfigManager;
+import fr.milekat.grimtown.utils.MongoDB;
+import fr.milekat.grimtown.utils.RabbitMQ;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 
-import java.util.Date;
+import java.io.IOException;
+import java.util.HashMap;
 
 public class MainBungee extends Plugin {
     //  Bungee/configs
     private static MainBungee mainBungee;
     private Configuration config;
-    public final static String PREFIX = "§7[§bLa Cité Givrée§7]§r ";
+    public static String PREFIX = "§7[§bEVENT§7]§r ";
     public static boolean DEBUG_ERRORS = false;
 
-    //  DataManager²
+    /* MongoDB */
+    private static HashMap<String, Datastore> datastoreMap = new HashMap<>();
+    /* Rabbit */
     public static boolean DEBUG_RABBIT = false;
-
-    //  Dates
-    public static Date DATE_MAINTENANCE = new Date();
-    public static Date DATE_MAINTENANCE_OFF = new Date();
-    public static Date DATE_OPEN = new Date();
-    public static Date DATE_BAN = new Date();
+    /* Event */
+    private ThisEvent thisEvent;
 
     @Override
     public void onEnable(){
-        /* Bungee/configs */
+        /* Bungee configs */
         mainBungee = this;
-        DataManager data = new DataManager(this);
-        config = data.getConfigurations();
-        /* DataManager */
+        ConfigManager data = new ConfigManager(this);
+        config = data.getConfigs();
+        data.loadConfigs();
+        /* MongoDB */
+        datastoreMap = MongoDB.getDatastoreMap(config);
+        /* RabbitMQ */
+        try {
+            new RabbitMQ().getRabbitConsumer().start();
+        } catch (IOException exception) {
+            warning("RabbitMQ consumer error ! RabbitMQ disabled");
+            exception.printStackTrace();
+        }
+        /* Master load */
 
-        /* Classes */
-        //new CoreManager(this, ProxyServer.getInstance().getPluginManager());
-        //new ConnectionsManager(this, ProxyServer.getInstance().getPluginManager());
-        //new ChatManager(this, ProxyServer.getInstance().getPluginManager());
-        //new ModerationManager(this, ProxyServer.getInstance().getPluginManager());
-        //new EconomyManager(this, ProxyServer.getInstance().getPluginManager());
+        /* Event load */
+        thisEvent = new ThisEvent();
+        if (DEBUG_ERRORS) log("Debugs enable, plugin loaded");
     }
 
     @Override
@@ -50,4 +61,13 @@ public class MainBungee extends Plugin {
     public static void warning(String log) { ProxyServer.getInstance().getLogger().warning(MainBungee.PREFIX + log); }
 
     public static Configuration getConfig() { return mainBungee.config; }
+
+    public ThisEvent getThisEvent() { return thisEvent; }
+
+    /**
+     * MongoDB Connection (Morphia Datastore) to query
+     */
+    public static Datastore getDatastore(String dbName) {
+        return datastoreMap.get(dbName).startSession();
+    }
 }
