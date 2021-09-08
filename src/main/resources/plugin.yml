@@ -1,0 +1,5 @@
+name: Bungee-Event
+author: MileKat
+main: fr.milekat.grimtown.MainBungee
+version: 1.0
+description: "Plugin proxy event par MileKat"
