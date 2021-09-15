@@ -1,8 +1,9 @@
-package fr.milekat.grimtown.master.classes;
+package fr.milekat.grimtown.proxy.moderation.classes;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.mapping.experimental.MorphiaReference;
+import fr.milekat.grimtown.proxy.core.classes.Profile;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
@@ -12,13 +13,11 @@ public class Ban {
     @Id
     private ObjectId id;
     private MorphiaReference<Profile> profile;
-    private Long channelId;
     private Date banDate;
     private Date lastUpdate;
     private Date pardonDate;
     private String reasonBan;
     private String reasonPardon;
-    private Boolean acknowledge;
 
     public Ban() {}
 
@@ -28,7 +27,6 @@ public class Ban {
         this.pardonDate = pardonDate;
         this.reasonBan = reasonBan;
         this.lastUpdate = new Date();
-        this.acknowledge = false;
     }
 
     public Profile getProfile() {
@@ -58,12 +56,6 @@ public class Ban {
     public Ban setReasonPardon(String reasonPardon) {
         this.lastUpdate = new Date();
         this.reasonPardon = reasonPardon;
-        return this;
-    }
-
-    public Ban setAcknowledge(Boolean acknowledge) {
-        this.lastUpdate = new Date();
-        this.acknowledge = acknowledge;
         return this;
     }
 }

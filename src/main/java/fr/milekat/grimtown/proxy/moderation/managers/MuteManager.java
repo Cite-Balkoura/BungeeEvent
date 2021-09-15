@@ -1,10 +1,10 @@
-package fr.milekat.grimtown.master.managers;
+package fr.milekat.grimtown.proxy.moderation.managers;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filters;
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.master.classes.Mute;
-import fr.milekat.grimtown.master.classes.Profile;
+import fr.milekat.grimtown.proxy.core.classes.Profile;
+import fr.milekat.grimtown.proxy.moderation.classes.Mute;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -18,7 +18,7 @@ public class MuteManager {
      */
     public static boolean isMuted(Profile profile) {
         return DATASTORE.find(Mute.class).filter(Filters.eq("acknowledge", false)).iterator().toList().
-                stream().anyMatch(ban -> ban.getProfile().getId().equals(profile.getId()));
+                stream().anyMatch(mute -> mute.getProfile().getId().equals(profile.getId()));
     }
 
     /**

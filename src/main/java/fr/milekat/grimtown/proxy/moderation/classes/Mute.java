@@ -1,8 +1,9 @@
-package fr.milekat.grimtown.master.classes;
+package fr.milekat.grimtown.proxy.moderation.classes;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.mapping.experimental.MorphiaReference;
+import fr.milekat.grimtown.proxy.core.classes.Profile;
 import org.bson.types.ObjectId;
 
 import java.util.Date;

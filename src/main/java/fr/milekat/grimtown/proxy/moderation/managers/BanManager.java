@@ -1,10 +1,10 @@
-package fr.milekat.grimtown.master.managers;
+package fr.milekat.grimtown.proxy.moderation.managers;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filters;
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.master.classes.Ban;
-import fr.milekat.grimtown.master.classes.Profile;
+import fr.milekat.grimtown.proxy.core.classes.Profile;
+import fr.milekat.grimtown.proxy.moderation.classes.Ban;
 
 import java.util.ArrayList;
 import java.util.Comparator;

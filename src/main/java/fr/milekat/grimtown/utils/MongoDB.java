@@ -45,7 +45,8 @@ public class MongoDB {
                 .enablePolymorphicQueries(true)
                 .build());
         datastore.getMapper().mapPackage("fr.milekat.grimtown.event.classes");
-        datastore.getMapper().mapPackage("fr.milekat.grimtown.master.classes");
+        datastore.getMapper().mapPackage("fr.milekat.grimtown.proxy.moderation.classes");
+        datastore.getMapper().mapPackage("fr.milekat.grimtown.proxy.core.classes");
         datastore.ensureIndexes();
         datastore.ensureCaps();
         datastore.enableDocumentValidation();

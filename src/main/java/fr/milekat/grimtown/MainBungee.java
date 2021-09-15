@@ -2,6 +2,7 @@ package fr.milekat.grimtown;
 
 import dev.morphia.Datastore;
 import fr.milekat.grimtown.event.ThisEvent;
+import fr.milekat.grimtown.proxy.ProxyManager;
 import fr.milekat.grimtown.utils.ConfigManager;
 import fr.milekat.grimtown.utils.MongoDB;
 import fr.milekat.grimtown.utils.RabbitMQ;
@@ -24,7 +25,7 @@ public class MainBungee extends Plugin {
     /* Rabbit */
     public static boolean DEBUG_RABBIT = false;
     /* Event */
-    private ThisEvent thisEvent;
+    private static ThisEvent thisEvent;
 
     @Override
     public void onEnable(){
@@ -43,7 +44,7 @@ public class MainBungee extends Plugin {
             exception.printStackTrace();
         }
         /* Master load */
-
+        new ProxyManager(this, ProxyServer.getInstance().getPluginManager());
         /* Event load */
         thisEvent = new ThisEvent();
         if (DEBUG_ERRORS) log("Debugs enable, plugin loaded");
@@ -62,7 +63,7 @@ public class MainBungee extends Plugin {
 
     public static Configuration getConfig() { return mainBungee.config; }
 
-    public ThisEvent getThisEvent() { return thisEvent; }
+    public static ThisEvent getThisEvent() { return thisEvent; }
 
     /**
      * MongoDB Connection (Morphia Datastore) to query

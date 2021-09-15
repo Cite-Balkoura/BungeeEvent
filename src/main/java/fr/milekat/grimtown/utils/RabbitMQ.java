@@ -5,9 +5,15 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 import fr.milekat.grimtown.MainBungee;
+import fr.milekat.grimtown.proxy.core.events.RabbitMQReceive;
+import net.md_5.bungee.api.ProxyServer;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
 public class RabbitMQ {
@@ -39,6 +45,14 @@ public class RabbitMQ {
         Channel channel = getConnection().createChannel();
         DeliverCallback deliverCallback = (consumerTag, message) -> {
             if (MainBungee.DEBUG_RABBIT) MainBungee.log(new String(message.getBody(), StandardCharsets.UTF_8));
+            try {
+                JSONObject json = (JSONObject) new JSONParser().parse(new String(message.getBody(), StandardCharsets.UTF_8));
+                RabbitMQReceive.MessageType messageType = RabbitMQReceive.MessageType.valueOf((String) Optional.ofNullable(json.get("type")).orElse("other"));
+                ProxyServer.getInstance().getPluginManager().callEvent(new RabbitMQReceive(messageType, json)
+                );
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         };
         return new Thread(() -> {
                     try {

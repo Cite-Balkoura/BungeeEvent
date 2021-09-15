@@ -1,19 +1,30 @@
-package fr.milekat.grimtown.master.managers;
+package fr.milekat.grimtown.proxy.core.manager;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filters;
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.master.classes.Profile;
+import fr.milekat.grimtown.proxy.core.classes.Profile;
+
+import java.util.UUID;
 
 public class ProfileManager {
     private static final Datastore DATASTORE = MainBungee.getDatastore("master");
 
     /**
-     * Get a Profile by his discord id
+     * Get a Profile by his username
      */
-    public static Profile getProfile(Long id) {
+    public static Profile getProfile(String username) {
         return DATASTORE.find(Profile.class)
-                .filter(Filters.eq("discordId", id))
+                .filter(Filters.eq("username", username))
+                .first();
+    }
+
+    /**
+     * Get a Profile by his UUID
+     */
+    public static Profile getProfile(UUID uuid) {
+        return DATASTORE.find(Profile.class)
+                .filter(Filters.eq("uuid", uuid))
                 .first();
     }
 
@@ -23,15 +34,6 @@ public class ProfileManager {
     public static boolean exists(String username) {
         return DATASTORE.find(Profile.class)
                 .filter(Filters.eq("username", username))
-                .first()!=null;
-    }
-
-    /**
-     * Check if Profile exist
-     */
-    public static boolean exists(Long discordId) {
-        return DATASTORE.find(Profile.class)
-                .filter(Filters.eq("discordId", discordId))
                 .first()!=null;
     }
 
