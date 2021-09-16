@@ -1,5 +1,5 @@
 core:
-  prefix: "[EVENT]"
+  prefix: "[EVENT] "
   event: "EventDefault"
   debug-exceptions: false
 #
@@ -7,17 +7,22 @@ core:
 data:
   mongo:
     host : "127.0.0.1"
-    port : 27017,
+    port : 27017
     user : "minecraft"
     password : "admin"
     db : "admin"
     databases : ["master"]
-  rabbitMQ: {
+  rabbitMQ:
+    debug : false
     host : "127.0.0.1"
     port : 5672
     user : "minecraft"
     password : "admin"
     exchange : "minecraft"
-    queue : "sub-queue"
-    routingKey : "pub-routingKey"
+    consumer:
+      queue : "bot-output"
+      routingKey : "bot-output"
+    publisher:
+      queue : "bot-input"
+      rootingKey : "bot-input"
 #

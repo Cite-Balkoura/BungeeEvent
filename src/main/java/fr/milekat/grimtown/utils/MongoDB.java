@@ -8,6 +8,10 @@ import dev.morphia.Datastore;
 import dev.morphia.Morphia;
 import dev.morphia.mapping.MapperOptions;
 import fr.milekat.grimtown.MainBungee;
+import fr.milekat.grimtown.event.classes.Event;
+import fr.milekat.grimtown.proxy.core.classes.Profile;
+import fr.milekat.grimtown.proxy.moderation.classes.Ban;
+import fr.milekat.grimtown.proxy.moderation.classes.Mute;
 import net.md_5.bungee.config.Configuration;
 import org.bson.UuidRepresentation;
 
@@ -44,9 +48,9 @@ public class MongoDB {
         Datastore datastore = Morphia.createDatastore(MongoClients.create(settings), dbName, MapperOptions.builder()
                 .enablePolymorphicQueries(true)
                 .build());
-        datastore.getMapper().mapPackage("fr.milekat.grimtown.event.classes");
-        datastore.getMapper().mapPackage("fr.milekat.grimtown.proxy.moderation.classes");
-        datastore.getMapper().mapPackage("fr.milekat.grimtown.proxy.core.classes");
+        datastore.getMapper().map(Event.class);
+        datastore.getMapper().map(Profile.class);
+        datastore.getMapper().map(Ban.class, Mute.class);
         datastore.ensureIndexes();
         datastore.ensureCaps();
         datastore.enableDocumentValidation();

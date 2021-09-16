@@ -17,55 +17,68 @@ import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
 public class RabbitMQ {
-    private static Connection CONNECTION = null;
+    public RabbitMQ() {
+        try {
+            Channel channel = getConnection().createChannel();
+            channel.exchangeDeclare(MainBungee.getConfig().getString("data.rabbitMQ.exchange"), "direct");
+            channel.queueDeclare(MainBungee.getConfig().getString("data.rabbitMQ.consumer.queue"),
+                    false, false, false, null);
+            channel.queueBind(MainBungee.getConfig().getString("data.rabbitMQ.consumer.queue"),
+                    MainBungee.getConfig().getString("data.rabbitMQ.exchange"),
+                    MainBungee.getConfig().getString("data.rabbitMQ.consumer.routingKey"));
+            channel.queueDeclare(MainBungee.getConfig().getString("data.rabbitMQ.publisher.queue"),
+                    false, false, false, null);
+            channel.queueBind(MainBungee.getConfig().getString("data.rabbitMQ.publisher.queue"),
+                    MainBungee.getConfig().getString("data.rabbitMQ.exchange"),
+                    MainBungee.getConfig().getString("data.rabbitMQ.publisher.routingKey"));
+            channel.close();
+            getConnection().close();
+        } catch (IOException | TimeoutException exception) {
+            exception.printStackTrace();
+        }
+    }
 
     /**
      * Init/Get RabbitMQ Connection
      */
-    private static Connection getConnection() {
-        if (CONNECTION == null) {
-            try {
-                ConnectionFactory connectionFactory = new ConnectionFactory();
-                connectionFactory.setHost(MainBungee.getConfig().getString("data.rabbitMQ.host"));
-                connectionFactory.setPort(MainBungee.getConfig().getInt("data.rabbitMQ.port"));
-                connectionFactory.setUsername(MainBungee.getConfig().getString("data.rabbitMQ.user"));
-                connectionFactory.setPassword(MainBungee.getConfig().getString("data.rabbitMQ.password"));
-                CONNECTION = connectionFactory.newConnection();
-            } catch (IOException | TimeoutException e) {
-                e.printStackTrace();
-            }
-        }
-        return CONNECTION;
+    private static Connection getConnection() throws IOException, TimeoutException {
+        ConnectionFactory connectionFactory = new ConnectionFactory();
+        connectionFactory.setHost(MainBungee.getConfig().getString("data.rabbitMQ.host"));
+        connectionFactory.setPort(MainBungee.getConfig().getInt("data.rabbitMQ.port"));
+        connectionFactory.setUsername(MainBungee.getConfig().getString("data.rabbitMQ.user"));
+        connectionFactory.setPassword(MainBungee.getConfig().getString("data.rabbitMQ.password"));
+        return connectionFactory.newConnection();
     }
 
     /**
      * Load RABBIT_CONFIG.get("queue") Consumer
      */
     public Thread getRabbitConsumer() throws IOException {
-        Channel channel = getConnection().createChannel();
-        DeliverCallback deliverCallback = (consumerTag, message) -> {
-            if (MainBungee.DEBUG_RABBIT) MainBungee.log(new String(message.getBody(), StandardCharsets.UTF_8));
-            try {
-                JSONObject json = (JSONObject) new JSONParser().parse(new String(message.getBody(), StandardCharsets.UTF_8));
-                RabbitMQReceive.MessageType messageType = RabbitMQReceive.MessageType.valueOf((String) Optional.ofNullable(json.get("type")).orElse("other"));
-                ProxyServer.getInstance().getPluginManager().callEvent(new RabbitMQReceive(messageType, json)
-                );
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        };
         return new Thread(() -> {
+            try {
+                DeliverCallback deliverCallback = (consumerTag, message) -> {
+                    if (MainBungee.DEBUG_RABBIT) MainBungee.log(new String(message.getBody(), StandardCharsets.UTF_8));
                     try {
-                        channel.basicConsume(
-                                MainBungee.getConfig().getString("data.rabbitMQ.queue"),
-                                true,
-                                deliverCallback,
-                                MainBungee::log
-                        );
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        JSONObject json = (JSONObject) new JSONParser().parse(new String(message.getBody(), StandardCharsets.UTF_8));
+                        RabbitMQReceive.MessageType messageType = RabbitMQReceive.MessageType.other;
+                        try {
+                            messageType = RabbitMQReceive.MessageType.valueOf((String) Optional.ofNullable(json.get("type")).orElse("other"));
+                        } catch (IllegalArgumentException ignore) {}
+                        ProxyServer.getInstance().getPluginManager().callEvent(new RabbitMQReceive(messageType, json));
+                        if (MainBungee.DEBUG_RABBIT && messageType.equals(RabbitMQReceive.MessageType.other)) {
+                            MainBungee.warning("RabbitMQ Unknown type: " + Optional.ofNullable(json.get("type")).orElse("other"));
+                        }
+                    } catch (ParseException exception) {
+                        exception.printStackTrace();
                     }
-                });
+                };
+                Channel channel = getConnection().createChannel();
+                channel.basicConsume(MainBungee.getConfig().getString("data.rabbitMQ.consumer.queue"),
+                        true, deliverCallback, MainBungee::log);
+            } catch (IOException | TimeoutException exception) {
+                exception.printStackTrace();
+            }
+        });
     }
 
     /**
@@ -74,8 +87,9 @@ public class RabbitMQ {
     public static void rabbitSend(String message) throws IOException, TimeoutException {
         Channel channel = getConnection().createChannel();
         channel.basicPublish(MainBungee.getConfig().getString("data.rabbitMQ.exchange"),
-                MainBungee.getConfig().getString("data.rabbitMQ.routingKey"),
+                MainBungee.getConfig().getString("data.rabbitMQ.publisher.routingKey"),
                 null, message.getBytes(StandardCharsets.UTF_8));
         channel.close();
+        getConnection().close();
     }
 }

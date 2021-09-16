@@ -33,6 +33,6 @@ public record ConfigManager(MainBungee mainBungee) {
     public void loadConfigs() {
         MainBungee.PREFIX = config.getString("core.prefix");
         MainBungee.DEBUG_ERRORS = config.getBoolean("core.debug-exceptions");
-        MainBungee.DEBUG_RABBIT = config.getBoolean("rabbitmq.debug");
+        MainBungee.DEBUG_RABBIT = config.getBoolean("data.rabbitMQ.debug");
     }
 }
