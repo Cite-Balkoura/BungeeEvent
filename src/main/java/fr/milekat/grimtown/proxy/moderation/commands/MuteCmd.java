@@ -2,7 +2,6 @@ package fr.milekat.grimtown.proxy.moderation.commands;
 
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
-import fr.milekat.grimtown.proxy.core.classes.Profile;
 import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import fr.milekat.grimtown.proxy.moderation.ModerationUtils;
 import fr.milekat.grimtown.utils.McTools;
@@ -26,18 +25,11 @@ public class MuteCmd extends Command implements TabExecutor {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length >= 3) {
-            if (!ProfileManager.exists(args[0])) {
-                sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cJoueur introuvable."));
-                return;
-            }
-            Profile profile = ProfileManager.getProfile(args[0]);
-            long time = DateMileKat.parsePeriod(args[1]) + new Date().getTime();
-            //  Check if value is less than 10s (10000ms)
-            if (time < (new Date().getTime() + 10000)) {
-                sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cMerci d'indiquer un délais suppérieur à 10s."));
-                return;
-            }
-            ModerationUtils.muteSend(profile.getUuid(), ((ProxiedPlayer) sender).getUniqueId(), time, CoreUtils.getArgsText(2, args));
+            if (ModerationUtils.cantProcessDelay(sender, args)) return;
+            ModerationUtils.muteSend(ProfileManager.getProfile(args[0]).getUuid(),
+                    ((ProxiedPlayer) sender).getUniqueId(),
+                    DateMileKat.parsePeriod(args[1]) + new Date().getTime(),
+                    CoreUtils.getArgsText(2, args));
         } else {
             sendHelp(sender);
         }
@@ -54,7 +46,8 @@ public class MuteCmd extends Command implements TabExecutor {
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
         if (args.length <= 1) {
-            return McTools.getTabArgs(args[0], ProxyServer.getInstance().getPlayers().stream().map(ProxiedPlayer::getName).collect(Collectors.toList()));
+            return McTools.getTabArgs(args[0], ProxyServer.getInstance().getPlayers().stream().map(ProxiedPlayer::getName)
+                    .collect(Collectors.toList()));
         }
         return new ArrayList<>();
     }

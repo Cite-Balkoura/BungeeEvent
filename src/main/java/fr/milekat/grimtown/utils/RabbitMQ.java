@@ -5,7 +5,6 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.proxy.core.events.RabbitMQReceive;
 import net.md_5.bungee.api.ProxyServer;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

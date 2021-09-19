@@ -1,7 +1,7 @@
 package fr.milekat.grimtown.proxy.moderation.events;
 
-import fr.milekat.grimtown.proxy.core.events.RabbitMQReceive;
 import fr.milekat.grimtown.proxy.moderation.ModerationUtils;
+import fr.milekat.grimtown.utils.RabbitMQReceive;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 

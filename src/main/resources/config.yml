@@ -20,9 +20,39 @@ data:
     password : "admin"
     exchange : "minecraft"
     consumer:
-      queue : "bot-output"
-      routingKey : "bot-output"
+      queue: "bot-output"
+      routingKey: "bot-output"
     publisher:
-      queue : "bot-input"
-      rootingKey : "bot-input"
+      queue: "bot-input"
+      routingKey: "bot-input"
 #
+
+proxy:
+  motd:
+    before:
+      motd: ""
+      protocol: 1
+      ping_msg: ""
+      ping_hover: ""
+    maintenance:
+      motd: ""
+      protocol: 1
+      ping_msg: ""
+      ping_hover: ""
+    open:
+      motd: ""
+      protocol: 0
+      ping_hover: ""
+  login:
+    # <EVENT_TIME> to show the reaming time until the start of event "Xd Xh Xm Xs"
+    not_started: "This event start in <EVENT_TIME>"
+    # <MAINTENANCE_TIME> to show the reaming time until the end of the maintenance "Xd Xh Xm Xs"
+    maintenance: "This server is under maintenance until <MAINTENANCE_TIME>"
+    full: "This server is full"
+    # <BAN_TIME> to show the reaming time until unban "Xd Xh Xm Xs"
+    ban: "You are banned until <BAN_TIME> for <REASON>"
+    not_register: "You are not registered"
+    # <PLAYER> to refer to the display name of player
+    join: "<PLAYER> has joined"
+    # <PLAYER> to refer to the display name of player
+    leave: "<PLAYER> has left"

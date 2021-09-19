@@ -1,7 +1,7 @@
 package fr.milekat.grimtown.proxy.moderation.events;
 
-import fr.milekat.grimtown.proxy.core.events.RabbitMQReceive;
 import fr.milekat.grimtown.proxy.moderation.ModerationUtils;
+import fr.milekat.grimtown.utils.RabbitMQReceive;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -13,7 +13,7 @@ public class BanDiscord implements Listener {
         if (event.getType().equals(RabbitMQReceive.MessageType.ban)) {
             ModerationUtils.ban(UUID.fromString(String.valueOf(event.getPayload().get("target"))),
                     UUID.fromString(String.valueOf(event.getPayload().get("sender"))),
-                    Long.getLong(String.valueOf(event.getPayload().get("delay"))),
+                    Long.parseLong(String.valueOf(event.getPayload().get("delay"))),
                     String.valueOf(event.getPayload().get("reason")));
         }
     }

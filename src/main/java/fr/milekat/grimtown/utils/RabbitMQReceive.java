@@ -1,4 +1,4 @@
-package fr.milekat.grimtown.proxy.core.events;
+package fr.milekat.grimtown.utils;
 
 import net.md_5.bungee.api.plugin.Event;
 import org.json.simple.JSONObject;

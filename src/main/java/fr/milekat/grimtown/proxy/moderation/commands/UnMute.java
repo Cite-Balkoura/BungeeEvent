@@ -19,12 +19,15 @@ public class UnMute extends Command {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length >= 2) {
+            if (ModerationUtils.cantProcess(sender, args)) return;
             Profile profile = ProfileManager.getProfile(args[0]);
             if (!MuteManager.isMuted(profile)) {
                 sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cJoueur pas mute."));
                 return;
             }
-            ModerationUtils.unMuteSend(profile.getUuid(), ((ProxiedPlayer) sender).getUniqueId(), CoreUtils.getArgsText(1, args));
+            ModerationUtils.unMuteSend(profile.getUuid(),
+                    ((ProxiedPlayer) sender).getUniqueId(),
+                    CoreUtils.getArgsText(1, args));
         } else {
             sendHelp(sender);
         }

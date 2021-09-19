@@ -18,6 +18,7 @@ public class Ban {
     private Date pardonDate;
     private String reasonBan;
     private String reasonPardon;
+    private Boolean acknowledge;
 
     public Ban() {}
 

@@ -2,6 +2,7 @@ package fr.milekat.grimtown.proxy.core.manager;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filters;
+import dev.morphia.query.experimental.updates.UpdateOperators;
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
 
@@ -31,16 +32,28 @@ public class ProfileManager {
     /**
      * Check if Profile exist
      */
-    public static boolean exists(String username) {
+    public static boolean notExists(UUID uuid) {
+        return DATASTORE.find(Profile.class)
+                .filter(Filters.eq("uuid", uuid))
+                .first() == null;
+    }
+
+    /**
+     * Check if Profile exist
+     */
+    public static boolean notExists(String username) {
         return DATASTORE.find(Profile.class)
                 .filter(Filters.eq("username", username))
-                .first()!=null;
+                .first() == null;
     }
 
     /**
      * Save/Update a Profile
      */
-    public static void save(Profile profile) {
-        DATASTORE.save(profile);
+    public static void updateUsername(UUID uuid, String username) {
+        DATASTORE.find(Profile.class)
+                .filter(Filters.eq("uuid", uuid))
+                .update(UpdateOperators.set("username", username))
+                .execute();
     }
 }

@@ -5,6 +5,7 @@ import fr.milekat.grimtown.proxy.core.classes.Profile;
 import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import fr.milekat.grimtown.utils.RabbitMQ;
 import fr.milekat.utils.DateMileKat;
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -15,6 +16,33 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 public class ModerationUtils {
+    /**
+     * Check if command can be processed
+     */
+    public static boolean cantProcess(CommandSender sender, String[] args) {
+        //  Check if target has a profile
+        if (ProfileManager.notExists(args[0])) {
+            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cJoueur introuvable."));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if command can be processed (with delay arg)
+     */
+    public static boolean cantProcessDelay(CommandSender sender, String[] args) {
+        if (cantProcess(sender, args)) return true;
+        //  Check if delay less than 10s (10000ms)
+        long time = DateMileKat.parsePeriod(args[1]) + new Date().getTime();
+        //  Check if value is less than 10s (10000ms)
+        if (time < (new Date().getTime() + 10000)) {
+            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cMerci d'indiquer un délais suppérieur à 10s."));
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Process a mute of a player (Notify player)
      */
@@ -32,17 +60,17 @@ public class ModerationUtils {
     /**
      * Process a mute of a player (Notify player and send into Rabbit)
      */
-    public static void muteSend(UUID target, UUID sender, Long time, String reason) {
+    public static void muteSend(UUID target, UUID sender, Long delay, String reason) {
         mute(target, sender, reason);
         try {
             RabbitMQ.rabbitSend(String.format("""
                         {
-                            "type": "ban",
+                            "type": "mute",
                             "target": "%s",
                             "sender": "%s",
-                            "delay": "%s",
+                            "delay": %s,
                             "reason": "%s"
-                        }""", target, sender, time, reason));
+                        }""", target, sender, delay, reason));
         } catch (IOException | TimeoutException exception) {
             MainBungee.warning("[Error] RabbitSend - mute");
             if (MainBungee.DEBUG_ERRORS) exception.printStackTrace();
@@ -84,14 +112,14 @@ public class ModerationUtils {
     /**
      * Process a ban of a player
      */
-    public static void ban(UUID target, UUID sender, Long time, String reason) {
+    public static void ban(UUID target, UUID sender, Long delay, String reason) {
         Profile pTarget = ProfileManager.getProfile(target);
         Profile pMod = ProfileManager.getProfile(sender);
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(pTarget.getUuid());
         if (player!=null && player.isConnected()) {
-            player.disconnect(new TextComponent(MainBungee.getConfig().getString("connection.ban")
-                    .replaceAll("@time", DateMileKat.reamingToString(new Date(time)))
-                    .replaceAll("@reason", reason)));
+            player.disconnect(new TextComponent(MainBungee.getConfig().getString("proxy.login.ban")
+                    .replaceAll("<BAN_TIME>", DateMileKat.reamingToString(new Date(delay)))
+                    .replaceAll("<REASON>", reason)));
         }
         MainBungee.info(pTarget.getUsername() + " a été ban par " + pMod.getUsername() + " pour " + reason);
     }
@@ -99,17 +127,17 @@ public class ModerationUtils {
     /**
      * Process a ban of a player
      */
-    public static void banSend(UUID target, UUID sender, Long time, String reason) {
-        ban(target, sender, time, reason);
+    public static void banSend(UUID target, UUID sender, Long delay, String reason) {
+        ban(target, sender, delay, reason);
         try {
             RabbitMQ.rabbitSend(String.format("""
                         {
                             "type": "ban",
                             "target": "%s",
                             "sender": "%s",
-                            "delay": "%s",
+                            "delay": %s,
                             "reason": "%s"
-                        }""", target, sender, time, reason));
+                        }""", target, sender, delay, reason));
         } catch (IOException | TimeoutException exception) {
             MainBungee.warning("[Error] RabbitSend - ban");
             if (MainBungee.DEBUG_ERRORS) exception.printStackTrace();

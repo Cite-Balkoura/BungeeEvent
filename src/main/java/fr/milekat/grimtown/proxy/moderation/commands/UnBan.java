@@ -19,12 +19,15 @@ public class UnBan extends Command {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length >= 2) {
+            if (ModerationUtils.cantProcess(sender, args)) return;
             Profile profile = ProfileManager.getProfile(args[0]);
             if (!BanManager.isBanned(profile)) {
                 sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cJoueur pas ban."));
                 return;
             }
-            ModerationUtils.unBanSend(profile.getUuid(), ((ProxiedPlayer) sender).getUniqueId(), CoreUtils.getArgsText(1, args));
+            ModerationUtils.unBanSend(profile.getUuid(),
+                    ((ProxiedPlayer) sender).getUniqueId(),
+                    CoreUtils.getArgsText(1, args));
         } else {
             sendHelp(sender);
         }

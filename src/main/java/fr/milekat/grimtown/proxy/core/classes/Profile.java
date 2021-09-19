@@ -20,14 +20,16 @@ public class Profile {
     @Indexed(options = @IndexOptions(unique = true))
     private long discordId;
     private Date registerDate;
+    private boolean staff;
 
     public Profile() {}
 
-    public Profile(String username, UUID uuid, long discordId, Date registerDate) {
+    public Profile(String username, UUID uuid, long discordId, Date registerDate, boolean staff) {
         this.username = username;
         this.uuid = uuid;
         this.discordId = discordId;
         this.registerDate = registerDate;
+        this.staff = staff;
     }
 
     public ObjectId getId() {
@@ -36,6 +38,11 @@ public class Profile {
 
     public String getUsername() {
         return username;
+    }
+
+    public Profile setUsername(String username) {
+        this.username = username;
+        return this;
     }
 
     public UUID getUuid() {
@@ -48,5 +55,9 @@ public class Profile {
 
     public Date getRegisterDate() {
         return registerDate;
+    }
+
+    public boolean isStaff() {
+        return staff;
     }
 }
