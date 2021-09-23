@@ -15,6 +15,7 @@ public class Event {
     private ObjectId id;
     @Indexed(options = @IndexOptions(unique = true))
     private String name;
+    private String database;
     private String type;
     private ArrayList<EventFeature> eventFeatures;
     private Date startDate;
@@ -31,18 +32,12 @@ public class Event {
 
     public Event() {}
 
-    public Event(String name, String type, ArrayList<EventFeature> eventFeatures, Date startDate, Date maintenanceDate, Date endDate, String description) {
-        this.name = name;
-        this.type = type;
-        this.eventFeatures = eventFeatures;
-        this.startDate = startDate;
-        this.maintenanceDate = maintenanceDate;
-        this.endDate = endDate;
-        this.description = description;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public String getDatabase() {
+        return database;
     }
 
     public String getType() {

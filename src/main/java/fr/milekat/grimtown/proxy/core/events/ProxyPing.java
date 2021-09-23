@@ -20,7 +20,7 @@ public class ProxyPing implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void proxyPing(ProxyPingEvent event) {
         ServerPing ping = event.getResponse();
-        if (MainBungee.getThisEvent().getEvent().getStartDate().getTime() > new Date().getTime()) {
+        if (MainBungee.getEvent().getStartDate().getTime() > new Date().getTime()) {
             ping.setDescriptionComponent(new TextComponent(getNode("proxy.motd.before.motd")));
             ping.getVersion().setProtocol(MainBungee.getConfig().getInt("proxy.motd.before.protocol"));
             ping.getVersion().setName(MainBungee.getConfig().getString("proxy.motd.before.ping_msg"));
@@ -29,7 +29,7 @@ public class ProxyPing implements Listener {
                     samples.add(new ServerPing.PlayerInfo(s, ""))
             );
             ping.getPlayers().setSample(samples.toArray(new ServerPing.PlayerInfo[0]));
-        } else if (MainBungee.getThisEvent().getEvent().getMaintenanceDate().getTime() > new Date().getTime()) {
+        } else if (MainBungee.getEvent().getMaintenanceDate().getTime() > new Date().getTime()) {
             ping.setDescriptionComponent(new TextComponent(getNode("proxy.motd.maintenance.motd")));
             ping.getVersion().setProtocol(MainBungee.getConfig().getInt("proxy.motd.maintenance.protocol"));
             ping.getVersion().setName(getNode("proxy.motd.maintenance.ping_msg"));
@@ -58,7 +58,7 @@ public class ProxyPing implements Listener {
      *
      */
     private String getNode(String path) {
-        Event event = MainBungee.getThisEvent().getEvent();
+        Event event = MainBungee.getEvent();
         return MainBungee.getConfig().getString(path).replaceAll("<PREFIX>", MainBungee.PREFIX)
                 .replaceAll("<EVENT_TIME>", DateMileKat.reamingToString(event.getStartDate()))
                 .replaceAll("<MAINTENANCE_TIME>", DateMileKat.reamingToString(event.getMaintenanceDate()));

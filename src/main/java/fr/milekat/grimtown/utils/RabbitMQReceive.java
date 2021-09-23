@@ -17,6 +17,9 @@ public class RabbitMQReceive extends Event {
         unmute,
         ban,
         unban,
+        connectEvent,
+        chatEvent,
+        announceEvent,
         other
     }
 

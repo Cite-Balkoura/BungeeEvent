@@ -7,7 +7,6 @@ import fr.milekat.utils.DateMileKat;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 import java.util.Date;
@@ -23,23 +22,24 @@ public class Maintenance extends Command {
             sendHelp(sender);
             return;
         }
-        Event event = MainBungee.getThisEvent().getEvent();
+        Event event = MainBungee.getEvent();
         if (args[0].equalsIgnoreCase("off")) {
             event.setMaintenanceDate(event.getStartDate());
             EventManager.save(event);
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cMaintenance désactivée."));
+            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cMaintenance disable."));
             return;
         } else if (args[0].equalsIgnoreCase("on")) args[0] = "5m";
         long time = DateMileKat.parsePeriod(args[0]) + new Date().getTime();
         //  Check if value is less than 10s (10000ms)
         if (time < (new Date().getTime() + 10000)) {
+            // TODO: 23/09/2021 Msg
             sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cMerci d'indiquer un délais suppérieur à 10s."));
             return;
         }
         event.setMaintenanceDate(new Date(time));
         switchOn(event);
         EventManager.save(event);
-        sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§2Maintenance activée pour: " +
+        sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§2Maintenance enable for: " +
                 DateMileKat.reamingToString(event.getMaintenanceDate()) + "§c."));
     }
 
@@ -48,13 +48,12 @@ public class Maintenance extends Command {
      */
     private void switchOn(Event event) {
         if (event.isMaintenance()) {
-            for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-                if (!player.hasPermission("mods.maintenance.bypass")) {
-                    player.disconnect(new TextComponent(MainBungee.getConfig().getString("connection.maintenance")
+            ProxyServer.getInstance().getPlayers().stream()
+                    .filter(player -> player.hasPermission("mods.maintenance.bypass"))
+                    .forEach(player -> player.disconnect(new TextComponent(
+                            MainBungee.getConfig().getString("proxy.chat.maintenance")
                             .replaceAll("@time", DateMileKat.reamingToString(event.getMaintenanceDate()))
-                    ));
-                }
-            }
+                    )));
         }
     }
 

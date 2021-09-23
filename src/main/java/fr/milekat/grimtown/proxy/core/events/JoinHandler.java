@@ -30,7 +30,7 @@ public class JoinHandler implements Listener {
             return;
         }
         Profile profile = ProfileManager.getProfile(event.getConnection().getUniqueId());
-        Event eventMc = MainBungee.getThisEvent().getEvent();
+        Event eventMc = MainBungee.getEvent();
         if (eventMc.getStartDate().getTime() > new Date().getTime()) {
             if (!profile.isStaff()) {
                 event.setCancelReason(new TextComponent(getNode("proxy.login.not_started")));
@@ -68,7 +68,7 @@ public class JoinHandler implements Listener {
     @EventHandler
     public void onJoinEvent(ServerConnectEvent event) {
         if (!event.getTarget().getName().equalsIgnoreCase("event")) return;
-        if (event.getPlayer().hasPermission("modo.event.connect.bypass")) return;
+        if (event.getPlayer().hasPermission("mods.event.connect.bypass")) return;
         try {
             Connection connection = MainBungee.getSql();
             PreparedStatement q = connection.prepareStatement("SELECT `value` FROM `mcpg_config` WHERE `name` = ?;");
@@ -92,7 +92,7 @@ public class JoinHandler implements Listener {
      *
      */
     private String getNode(String path) {
-        Event event = MainBungee.getThisEvent().getEvent();
+        Event event = MainBungee.getEvent();
         return MainBungee.getConfig().getString(path).replaceAll("<PREFIX>", MainBungee.PREFIX)
                 .replaceAll("<EVENT_TIME>", DateMileKat.reamingToString(event.getStartDate()))
                 .replaceAll("<MAINTENANCE_TIME>", DateMileKat.reamingToString(event.getMaintenanceDate()));
