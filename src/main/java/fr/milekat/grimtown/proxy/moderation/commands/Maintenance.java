@@ -3,6 +3,7 @@ package fr.milekat.grimtown.proxy.moderation.commands;
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.event.classes.Event;
 import fr.milekat.grimtown.event.manager.EventManager;
+import fr.milekat.grimtown.proxy.core.CoreUtils;
 import fr.milekat.utils.DateMileKat;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -25,34 +26,31 @@ public class Maintenance extends Command {
         Event event = MainBungee.getEvent();
         if (args[0].equalsIgnoreCase("off")) {
             event.setMaintenanceDate(event.getStartDate());
-            EventManager.save(event);
+            EventManager.updateMaintenance(event);
             sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cMaintenance disable."));
             return;
         } else if (args[0].equalsIgnoreCase("on")) args[0] = "5m";
         long time = DateMileKat.parsePeriod(args[0]) + new Date().getTime();
         //  Check if value is less than 10s (10000ms)
         if (time < (new Date().getTime() + 10000)) {
-            // TODO: 23/09/2021 Msg
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cMerci d'indiquer un délais suppérieur à 10s."));
+            sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.core.messages.time_too_low")));
             return;
         }
         event.setMaintenanceDate(new Date(time));
         switchOn(event);
-        EventManager.save(event);
-        sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§2Maintenance enable for: " +
-                DateMileKat.reamingToString(event.getMaintenanceDate()) + "§c."));
+        EventManager.updateMaintenance(event);
+        sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.core.messages.maintenance.enabled")));
     }
 
     /**
-     * Kick all players
+     * Kick all players if maintenance is enabled
      */
     private void switchOn(Event event) {
         if (event.isMaintenance()) {
             ProxyServer.getInstance().getPlayers().stream()
                     .filter(player -> player.hasPermission("mods.maintenance.bypass"))
                     .forEach(player -> player.disconnect(new TextComponent(
-                            MainBungee.getConfig().getString("proxy.chat.maintenance")
-                            .replaceAll("@time", DateMileKat.reamingToString(event.getMaintenanceDate()))
+                            CoreUtils.getString("proxy.core.messages.maintenance.kick")
                     )));
         }
     }

@@ -48,13 +48,13 @@ public class ModerationUtils {
      */
     public static void mute(UUID target, UUID sender, String reason) {
         Profile pTarget = ProfileManager.getProfile(target);
-        Profile pMod = ProfileManager.getProfile(sender);
+        Profile pSender = ProfileManager.getProfile(sender);
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(pTarget.getUuid());
         if (player!=null && player.isConnected()) {
             player.sendMessage(new TextComponent(MainBungee.PREFIX + "§cVous êtes mute !"));
             player.sendMessage(new TextComponent(MainBungee.PREFIX + "§6Raison:§r " + reason));
         }
-        MainBungee.info(pTarget.getUsername() + " a été mute par " + pMod.getUsername() + " pour " + reason);
+        MainBungee.info(pTarget.getUsername() + " a été mute par " + pSender.getUsername() + " pour " + reason);
     }
 
     /**
@@ -114,14 +114,14 @@ public class ModerationUtils {
      */
     public static void ban(UUID target, UUID sender, Long delay, String reason) {
         Profile pTarget = ProfileManager.getProfile(target);
-        Profile pMod = ProfileManager.getProfile(sender);
+        Profile pSender = ProfileManager.getProfile(sender);
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(pTarget.getUuid());
         if (player!=null && player.isConnected()) {
             player.disconnect(new TextComponent(MainBungee.getConfig().getString("proxy.login.ban")
                     .replaceAll("<BAN_TIME>", DateMileKat.reamingToString(new Date(delay)))
                     .replaceAll("<REASON>", reason)));
         }
-        MainBungee.info(pTarget.getUsername() + " a été ban par " + pMod.getUsername() + " pour " + reason);
+        MainBungee.info(pTarget.getUsername() + " a été ban par " + pSender.getUsername() + " pour " + reason);
     }
 
     /**

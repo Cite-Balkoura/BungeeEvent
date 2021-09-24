@@ -9,6 +9,8 @@ import fr.milekat.grimtown.proxy.core.classes.Profile;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity(value = "team")
 public class Team {
@@ -27,5 +29,9 @@ public class Team {
 
     public ArrayList<Profile> getMembers() {
         return members.get();
+    }
+
+    public ArrayList<UUID> getMembersUUIDs() {
+        return getMembers().stream().map(Profile::getUuid).collect(Collectors.toCollection(ArrayList::new));
     }
 }

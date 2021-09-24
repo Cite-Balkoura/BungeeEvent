@@ -1,6 +1,7 @@
 package fr.milekat.grimtown.proxy.chat.commands;
 
 import fr.milekat.grimtown.MainBungee;
+import fr.milekat.grimtown.event.features.manager.TeamManager;
 import fr.milekat.grimtown.proxy.chat.ChatUtils;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
 import net.md_5.bungee.api.CommandSender;
@@ -17,7 +18,8 @@ public class ChatTeam extends Command {
     public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) return;
         if (args.length > 0) {
-            ChatUtils.sendChatTeam((ProxiedPlayer) sender, CoreUtils.getArgsText(0, args));
+            ChatUtils.sendNewChatTeam(TeamManager.getTeam(((ProxiedPlayer) sender).getUniqueId()),
+                    (ProxiedPlayer) sender, CoreUtils.getArgsText(0, args));
         } else sendHelp(sender);
     }
 

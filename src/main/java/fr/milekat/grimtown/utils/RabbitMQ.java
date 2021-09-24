@@ -60,12 +60,13 @@ public class RabbitMQ {
                     try {
                         JSONObject json = (JSONObject) new JSONParser().parse(new String(message.getBody(), StandardCharsets.UTF_8));
                         RabbitMQReceive.MessageType messageType = RabbitMQReceive.MessageType.other;
+                        String type = (String) Optional.ofNullable(json.get("type")).orElse("other");
                         try {
-                            messageType = RabbitMQReceive.MessageType.valueOf((String) Optional.ofNullable(json.get("type")).orElse("other"));
+                            messageType = RabbitMQReceive.MessageType.valueOf(type);
                         } catch (IllegalArgumentException ignore) {}
                         ProxyServer.getInstance().getPluginManager().callEvent(new RabbitMQReceive(messageType, json));
                         if (MainBungee.DEBUG_RABBIT && messageType.equals(RabbitMQReceive.MessageType.other)) {
-                            MainBungee.warning("RabbitMQ Unknown type: " + Optional.ofNullable(json.get("type")).orElse("other"));
+                            MainBungee.warning("RabbitMQ Unknown type: " + type);
                         }
                     } catch (ParseException exception) {
                         exception.printStackTrace();

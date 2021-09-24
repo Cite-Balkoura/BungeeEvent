@@ -1,6 +1,10 @@
 package fr.milekat.grimtown.proxy.chat.commands;
 
 import fr.milekat.grimtown.MainBungee;
+import fr.milekat.grimtown.event.features.classes.Team;
+import fr.milekat.grimtown.event.features.manager.TeamManager;
+import fr.milekat.grimtown.proxy.core.CoreUtils;
+import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import fr.milekat.grimtown.utils.McTools;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -10,10 +14,11 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class ChatMode extends Command implements TabExecutor {
-    private final ArrayList<ProxiedPlayer> CHAT_TEAM;
-    public ChatMode(ArrayList<ProxiedPlayer> chat_team) {
+    private final HashMap<ProxiedPlayer, Team> CHAT_TEAM;
+    public ChatMode(HashMap<ProxiedPlayer, Team> chat_team) {
         super("chat");
         this.CHAT_TEAM = chat_team;
     }
@@ -23,12 +28,20 @@ public class ChatMode extends Command implements TabExecutor {
         if (!(sender instanceof ProxiedPlayer)) return;
         if (args.length==1 && args[0].equalsIgnoreCase("all")) {
             CHAT_TEAM.remove(((ProxiedPlayer) sender));
-            // TODO: 23/09/2021 Msg
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§6Chat général activé"));
-        } else if (args.length==1 && args[0].equalsIgnoreCase("team")) {
-            CHAT_TEAM.add(((ProxiedPlayer) sender));
-            // TODO: 23/09/2021 Msg
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§6Chat équipe activé"));
+            sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.chat.messages.mode.all")));
+        } else if (args.length>=1 && args[0].equalsIgnoreCase("team")) {
+            Team team = null;
+            if (args.length==1) {
+                team = TeamManager.getTeam(((ProxiedPlayer) sender).getUniqueId());
+            } else if (sender.hasPermission("mods.chat.team.other")) {
+                team = TeamManager.getTeam(ProfileManager.getProfile(args[1]));
+            }
+            if (team == null) {
+                sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.chat.messages.mode.team")));
+            } else {
+                CHAT_TEAM.put(((ProxiedPlayer) sender), team);
+                sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.core.messages.no_team")));
+            }
         } else {
             sendHelp(sender);
         }

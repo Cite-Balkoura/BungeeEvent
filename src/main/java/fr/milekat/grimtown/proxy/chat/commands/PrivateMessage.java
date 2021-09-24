@@ -27,10 +27,9 @@ public class PrivateMessage extends Command implements TabExecutor {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        Profile profile = ProfileManager.getProfile(((ProxiedPlayer) sender).getUniqueId());
+        Profile profile = ProfileManager.getProfile(((ProxiedPlayer) sender));
         if (MuteManager.isMuted(profile)) {
-            // TODO: 23/09/2021 msg
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cTu es mute !"));
+            ChatUtils.warnMute((ProxiedPlayer) sender, MuteManager.getLastMute(profile));
             return;
         }
         if (args.length < 2) {
@@ -38,18 +37,16 @@ public class PrivateMessage extends Command implements TabExecutor {
             return;
         }
         if (sender.getName().equalsIgnoreCase(args[0])) {
-            // TODO: 23/09/2021 msg
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cTu ne peux t'envoyer de MP !"));
+            sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.chat.messages.private.self")));
             return;
         }
         ProxiedPlayer pSender = ProxyServer.getInstance().getPlayer(sender.getName());
         ProxiedPlayer pDest = ProxyServer.getInstance().getPlayer(args[0]);
         if (pDest==null || !pDest.isConnected()) {
-            // TODO: 23/09/2021 msg
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cLe joueur est introuvable."));
+            sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.core.messages.player_not_found")));
             return;
         }
-        ChatUtils.sendPrivate(pSender, pDest, CoreUtils.getArgsText(1, args));
+        ChatUtils.sendNewPrivate(pSender, pDest, CoreUtils.getArgsText(1, args));
         PRIVATE_LAST.put(pSender, pDest);
         PRIVATE_LAST.put(pDest, pSender);
     }

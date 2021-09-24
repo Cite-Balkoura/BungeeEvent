@@ -2,6 +2,7 @@ package fr.milekat.grimtown.event.manager;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filters;
+import dev.morphia.query.experimental.updates.UpdateOperators;
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.event.classes.Event;
 
@@ -27,9 +28,12 @@ public class EventManager {
     }
 
     /**
-     * Save/Update an event
+     * Update maintenanceDate from this event
      */
-    public static void save(Event event) {
-        DATASTORE.save(event);
+    public static void updateMaintenance(Event event) {
+        DATASTORE.find(Event.class)
+                .filter(Filters.eq("name", event.getName()))
+                .update(UpdateOperators.set("maintenanceDate", event.getMaintenanceDate()))
+                .execute();
     }
 }

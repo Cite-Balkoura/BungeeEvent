@@ -3,8 +3,10 @@ package fr.milekat.grimtown.proxy.chat.commands;
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.proxy.chat.ChatUtils;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
+import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 public class Announce extends Command {
@@ -17,7 +19,8 @@ public class Announce extends Command {
         if (args.length < 1) {
             sendHelp(sender);
         } else {
-            ChatUtils.sendAnnounce(CoreUtils.getArgsText(0, args));
+            ChatUtils.sendNewAnnounce(CoreUtils.getArgsText(0, args),
+                    ProfileManager.getProfile(((ProxiedPlayer) sender).getUniqueId()));
         }
     }
 

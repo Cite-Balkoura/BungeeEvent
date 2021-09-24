@@ -28,15 +28,30 @@ data:
 #
 
 proxy:
+  core:
+    max_players: 150
+    messages:
+      time_too_low: "<PREFIX>Please use a duration of 10s minimum."
+      player_not_found: "<PREFIX>Can't find this player."
+      no_team: "<PREFIX>You don't have a team."
+      maintenance:
+        kick: "Server in maintenance"
+        enabled: "<PREFIX>Maintenance enable for: <MAINTENANCE_TIME>"
   chat:
     messages:
       # Announce message format, <ANNOUNCE> will be replaced by the announcement message
-      announces: "§r§7§m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯§r §7[§6Announce§7§7]§r §r§7§m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯§r§r\n\n<ANNOUNCE>\n§7§m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯§r §7[§6Announce§7§7]§r §r§7§m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯§r"
-      maintenance: "Server in maintenance"
+      announces: "&r&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r &7[&6Announce&7&7]&r &r&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r&r\n\n<ANNOUNCE>\n&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r &7[&6Announce&7&7]&r &r&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r"
       # <REAMING> will be replaced by unmute reaming time
       unMuteNotify:
         message: "<PREFIX>You will be unmute in <REAMING>"
         hover: "Be careful,\nstaff can see\nyour messages"
+      mode:
+        all: "<PREFIX>Chat set to global."
+        team: "<PREFIX>Chat set to team."
+      private:
+        self: "<PREFIX>You can't private yourself !"
+        last_not_found: "<PREFIX>No recent direct message found."
+        last_not_connected: "<PREFIX>Your last direct is not connected anymore."
     spam:
       limit:
         kick: 10
@@ -65,8 +80,8 @@ proxy:
       protocol: 0
       ping_hover: ""
   login:
-    # <EVENT_TIME> to show the reaming time until the start of event "Xd Xh Xm Xs"
-    not_started: "This event start in <EVENT_TIME>"
+    # <EVENT_START_TIME> to show the reaming time until the start of event "Xd Xh Xm Xs"
+    not_started: "This event start in <EVENT_START_TIME>"
     # <MAINTENANCE_TIME> to show the reaming time until the end of the maintenance "Xd Xh Xm Xs"
     maintenance: "This server is under maintenance until <MAINTENANCE_TIME>"
     full: "This server is full"
@@ -77,3 +92,4 @@ proxy:
     join: "<PLAYER> has joined"
     # <PLAYER> to refer to the display name of player
     leave: "<PLAYER> has left"
+#

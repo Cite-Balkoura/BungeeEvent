@@ -25,15 +25,13 @@ public class Reply extends Command {
     public void execute(CommandSender sender, String[] args) {
         ProxiedPlayer pSender = ProxyServer.getInstance().getPlayer(sender.getName());
         if (!PRIVATE_LAST.containsKey(pSender)) {
-            // TODO: 23/09/2021 Msg
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cAucun correspondant récent trouvé."));
+            sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.chat.messages.private.last_not_found")));
             return;
         }
         ProxiedPlayer pDest = PRIVATE_LAST.get(pSender);
         Profile profile = ProfileManager.getProfile(sender.getName());
         if (MuteManager.isMuted(profile)) {
-            // TODO: 23/09/2021 Msg
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cTu es mute !"));
+            ChatUtils.warnMute((ProxiedPlayer) sender, MuteManager.getLastMute(profile));
             return;
         }
         if (args.length < 1) {
@@ -41,11 +39,10 @@ public class Reply extends Command {
             return;
         }
         if (pDest==null || !pDest.isConnected()) {
-            // TODO: 23/09/2021 Msg
-            sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cLe joueur n'est connecté."));
+            sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.chat.messages.private.last_not_connected")));
             return;
         }
-        ChatUtils.sendPrivate(pSender, pDest, CoreUtils.getArgsText(0, args));
+        ChatUtils.sendNewPrivate(pSender, pDest, CoreUtils.getArgsText(0, args));
         PRIVATE_LAST.put(pSender, pDest);
         PRIVATE_LAST.put(pDest, pSender);
     }

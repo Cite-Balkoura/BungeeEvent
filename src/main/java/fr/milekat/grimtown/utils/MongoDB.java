@@ -9,6 +9,9 @@ import dev.morphia.Morphia;
 import dev.morphia.mapping.MapperOptions;
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.event.classes.Event;
+import fr.milekat.grimtown.event.features.classes.Team;
+import fr.milekat.grimtown.proxy.chat.classes.Announce;
+import fr.milekat.grimtown.proxy.chat.classes.Message;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
 import fr.milekat.grimtown.proxy.moderation.classes.Ban;
 import fr.milekat.grimtown.proxy.moderation.classes.Mute;
@@ -48,7 +51,8 @@ public class MongoDB {
         Datastore datastore = Morphia.createDatastore(MongoClients.create(settings), dbName, MapperOptions.builder()
                 .enablePolymorphicQueries(true)
                 .build());
-        datastore.getMapper().map(Event.class);
+        datastore.getMapper().map(Event.class, Team.class);
+        datastore.getMapper().map(Announce.class, Message.class);
         datastore.getMapper().map(Profile.class);
         datastore.getMapper().map(Ban.class, Mute.class);
         datastore.ensureIndexes();
