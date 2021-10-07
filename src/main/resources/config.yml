@@ -40,7 +40,7 @@ proxy:
   chat:
     messages:
       # Announce message format, <ANNOUNCE> will be replaced by the announcement message
-      announces: "&r&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r &7[&6Announce&7&7]&r &r&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r&r\n\n<ANNOUNCE>\n&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r &7[&6Announce&7&7]&r &r&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r"
+      announces: "&r&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r &7[&6Announce&7&7]&r &r&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r&r\n\n<ANNOUNCE>\n&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r &7[&6Announce&7&7]&r &r&7&m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯&r"
       # <REAMING> will be replaced by unmute reaming time
       unMuteNotify:
         message: "<PREFIX>You will be unmute in <REAMING>"

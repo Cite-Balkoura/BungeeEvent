@@ -5,10 +5,12 @@ import dev.morphia.annotations.Id;
 import dev.morphia.mapping.experimental.MorphiaReference;
 import fr.milekat.grimtown.event.features.classes.Team;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
+import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import fr.milekat.grimtown.proxy.moderation.managers.MuteManager;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Entity(value = "message")
 public class Message {
@@ -17,8 +19,8 @@ public class Message {
     private Type type;
     private String message;
     private Date date;
-    private MorphiaReference<Profile> sender;
-    private MorphiaReference<Profile> receiver;
+    private UUID sender;
+    private UUID receiver;
     private MorphiaReference<Team> team;
     private boolean muted;
     private MessageRemove remove;
@@ -43,7 +45,7 @@ public class Message {
         type = Type.chat;
         this.message = message;
         muted = MuteManager.isMuted(sender);
-        this.sender = MorphiaReference.wrap(sender);
+        this.sender = sender.getUuid();
         date = new Date();
     }
 
@@ -54,7 +56,7 @@ public class Message {
         id = new ObjectId();
         this.type = type;
         this.message = message;
-        this.sender = MorphiaReference.wrap(sender);
+        this.sender = sender.getUuid();
         date = new Date();
     }
 
@@ -65,8 +67,8 @@ public class Message {
         id = new ObjectId();
         type = Type.direct;
         this.message = message;
-        this.sender = MorphiaReference.wrap(sender);
-        this.receiver = MorphiaReference.wrap(receiver);
+        this.sender = sender.getUuid();
+        this.receiver = receiver.getUuid();
         date = new Date();
     }
 
@@ -77,7 +79,7 @@ public class Message {
         id = new ObjectId();
         type = Type.team;
         this.message = message;
-        this.sender = MorphiaReference.wrap(sender);
+        this.sender = sender.getUuid();
         this.team = MorphiaReference.wrap(team);
         date = new Date();
     }
@@ -108,11 +110,11 @@ public class Message {
     }
 
     public Profile getSender() {
-        return sender.get();
+        return ProfileManager.getProfile(sender);
     }
 
     public Profile getReceiver() {
-        return receiver.get();
+        return ProfileManager.getProfile(receiver);
     }
 
     public Team getTeam() {
@@ -136,5 +138,30 @@ public class Message {
         return remove!=null;
     }
 
-    private record MessageRemove(Profile remover, String reason, Date date) {}
+    @Entity
+    public static class MessageRemove {
+        private UUID remover;
+        private String reason;
+        private Date date;
+
+        public MessageRemove() {}
+
+        public MessageRemove(Profile remover, String reason, Date date) {
+            this.remover = remover.getUuid();
+            this.reason = reason;
+            this.date = date;
+        }
+
+        public Profile getRemover() {
+            return ProfileManager.getProfile(remover);
+        }
+
+        public String getReason() {
+            return reason;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+    }
 }

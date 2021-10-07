@@ -7,22 +7,27 @@ import dev.morphia.query.experimental.filters.Filters;
 import dev.morphia.query.experimental.updates.UpdateOperators;
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.proxy.chat.classes.Message;
+import org.bson.types.ObjectId;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 
 public class MessageManager {
     private static final Datastore DATASTORE = MainBungee.getDatastore(MainBungee.getEvent().getDatabase());
 
     public static Message getMessage(String id) {
-        return DATASTORE.find(Message.class).filter(Filters.eq("id", id)).first();
+        return DATASTORE.find(Message.class).filter(Filters.eq("_id", new ObjectId(id))).first();
     }
 
     /**
      * Get X last messages
      */
     public static ArrayList<Message> getLast(int count) {
-        return new ArrayList<>(DATASTORE.find(Message.class)
-                .iterator(new FindOptions().sort(Sort.ascending("id")).limit(count)).toList());
+        ArrayList<Message> output = new ArrayList<>();
+        new ArrayDeque<>(DATASTORE.find(Message.class)
+                .iterator(new FindOptions().sort(Sort.descending("_id")).limit(count)).toList())
+                .descendingIterator().forEachRemaining(output::add);
+        return output;
     }
 
     /**
@@ -30,7 +35,7 @@ public class MessageManager {
      */
     public static Message getLast(Message.Type type) {
         return DATASTORE.find(Message.class).filter(Filters.eq("type", type))
-                .iterator(new FindOptions().sort(Sort.ascending("id")).limit(1)).tryNext();
+                .iterator(new FindOptions().sort(Sort.descending("_id")).limit(1)).tryNext();
     }
 
     /**

@@ -29,7 +29,7 @@ public class MongoDB {
         HashMap<String, Datastore> datastoreMap = new HashMap<>();
         for (Object dbName : config.getStringList("data.mongo.databases")) {
             if (MainBungee.DEBUG_ERRORS) MainBungee.log("[Mongo] Load db: " + dbName.toString());
-            datastoreMap.put(dbName.toString(), setDatastore(config, dbName.toString()));
+            datastoreMap.put(dbName.toString(), setDatastore(config, dbName.toString()).startSession());
         }
         if (MainBungee.DEBUG_ERRORS) MainBungee.log("[Mongo] " + datastoreMap.size() + " db loaded");
         return datastoreMap;
@@ -51,10 +51,11 @@ public class MongoDB {
         Datastore datastore = Morphia.createDatastore(MongoClients.create(settings), dbName, MapperOptions.builder()
                 .enablePolymorphicQueries(true)
                 .build());
-        datastore.getMapper().map(Event.class, Team.class);
-        datastore.getMapper().map(Announce.class, Message.class);
-        datastore.getMapper().map(Profile.class);
-        datastore.getMapper().map(Ban.class, Mute.class);
+        if (dbName.equalsIgnoreCase("master")) {
+            datastore.getMapper().map(Event.class, Profile.class, Ban.class, Mute.class);
+        } else {
+            datastore.getMapper().map(Team.class, Announce.class, Message.class);
+        }
         datastore.ensureIndexes();
         datastore.ensureCaps();
         datastore.enableDocumentValidation();

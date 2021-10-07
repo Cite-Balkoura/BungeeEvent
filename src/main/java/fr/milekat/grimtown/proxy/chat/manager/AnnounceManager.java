@@ -15,7 +15,7 @@ public class AnnounceManager {
     /**
      * Get a Team from a member
      */
-    public static Announce getRandomAnnounce() {
+    public static Announce getRandom() {
         ArrayList<Announce> announces = new ArrayList<>(DATASTORE.find(Announce.class)
                 .filter(Filters.lte("startDate", new Date()), Filters.gte("endDate", new Date()))
                 .iterator().toList());

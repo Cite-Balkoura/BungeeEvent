@@ -4,13 +4,12 @@ import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexed;
-import dev.morphia.mapping.experimental.MorphiaReference;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
+import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity(value = "team")
 public class Team {
@@ -19,7 +18,7 @@ public class Team {
     @Indexed(options = @IndexOptions(unique = true))
     private String teamName;
     @Indexed(options = @IndexOptions(unique = true))
-    private MorphiaReference<ArrayList<Profile>> members;
+    private ArrayList<UUID> members;
 
     public Team() {}
 
@@ -27,11 +26,11 @@ public class Team {
         return teamName;
     }
 
-    public ArrayList<Profile> getMembers() {
-        return members.get();
+    public ArrayList<Profile> getProfiles() {
+        return ProfileManager.getProfiles(members);
     }
 
-    public ArrayList<UUID> getMembersUUIDs() {
-        return getMembers().stream().map(Profile::getUuid).collect(Collectors.toCollection(ArrayList::new));
+    public ArrayList<UUID> getMembers() {
+        return members;
     }
 }

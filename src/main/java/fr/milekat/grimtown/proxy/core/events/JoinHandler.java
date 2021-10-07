@@ -59,7 +59,9 @@ public class JoinHandler implements Listener {
 
     @EventHandler
     public void onJoinUpdateProfile(PostLoginEvent event) {
-        ProfileManager.updateUsername(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+        ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), () ->
+                ProfileManager.updateUsername(event.getPlayer().getUniqueId(), event.getPlayer().getName())
+        );
     }
 
     /*  Send player to his last server
