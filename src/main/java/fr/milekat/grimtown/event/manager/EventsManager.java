@@ -8,7 +8,7 @@ import fr.milekat.grimtown.event.classes.Event;
 
 import java.util.ArrayList;
 
-public class EventManager {
+public class EventsManager {
     private static final Datastore DATASTORE = MainBungee.getDatastore("master");
 
     /**

@@ -9,7 +9,7 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.Date;
 
-@Entity(value = "eventMain")
+@Entity(value = "event")
 public class Event {
     @Id
     private ObjectId id;
@@ -21,7 +21,6 @@ public class Event {
     private Date startDate;
     private Date maintenanceDate;
     private Date endDate;
-    private String description;
 
     public enum EventFeature {
         TIME,
@@ -66,9 +65,5 @@ public class Event {
 
     public Date getEndDate() {
         return endDate;
-    }
-
-    public String getDescription() {
-        return description;
     }
 }

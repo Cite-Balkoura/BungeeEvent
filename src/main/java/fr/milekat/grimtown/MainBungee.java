@@ -1,8 +1,9 @@
 package fr.milekat.grimtown;
 
 import dev.morphia.Datastore;
-import fr.milekat.grimtown.event.ThisEvent;
+import fr.milekat.grimtown.event.EventManager;
 import fr.milekat.grimtown.event.classes.Event;
+import fr.milekat.grimtown.event.manager.EventsManager;
 import fr.milekat.grimtown.proxy.ProxyManager;
 import fr.milekat.grimtown.utils.ConfigManager;
 import fr.milekat.grimtown.utils.MongoDB;
@@ -26,7 +27,7 @@ public class MainBungee extends Plugin {
     /* Rabbit */
     public static boolean DEBUG_RABBIT = false;
     /* Event */
-    private static ThisEvent thisEvent;
+    private static Event mcEvent;
 
     @Override
     public void onEnable(){
@@ -45,7 +46,8 @@ public class MainBungee extends Plugin {
             exception.printStackTrace();
         }
         /* Event load */
-        thisEvent = new ThisEvent();
+        mcEvent = EventsManager.getEvent(mainBungee.config.getString("core.event"));
+        new EventManager(mcEvent);
         /* Master load */
         new ProxyManager(this, ProxyServer.getInstance().getPluginManager());
         if (DEBUG_ERRORS) log("Debugs enable, plugin loaded");
@@ -53,13 +55,22 @@ public class MainBungee extends Plugin {
 
     public static MainBungee getInstance(){ return mainBungee; }
 
+    /**
+     * Console logging
+     */
     public static void log(String message) { ProxyServer.getInstance().getLogger().info(MainBungee.PREFIX + message); }
     public static void info(String log) { ProxyServer.getInstance().getLogger().info(MainBungee.PREFIX + log); }
     public static void warning(String log) { ProxyServer.getInstance().getLogger().warning(MainBungee.PREFIX + log); }
 
+    /**
+     * Get loaded config shortcut
+     */
     public static Configuration getConfig() { return mainBungee.config; }
 
-    public static Event getEvent() { return thisEvent.getEvent(); }
+    /**
+     * Get loaded Event shortcut
+     */
+    public static Event getEvent() { return mcEvent; }
 
     /**
      * MongoDB Connection (Morphia Datastore) to query

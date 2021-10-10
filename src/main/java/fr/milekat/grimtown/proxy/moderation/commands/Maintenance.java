@@ -2,7 +2,7 @@ package fr.milekat.grimtown.proxy.moderation.commands;
 
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.event.classes.Event;
-import fr.milekat.grimtown.event.manager.EventManager;
+import fr.milekat.grimtown.event.manager.EventsManager;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
 import fr.milekat.utils.DateMileKat;
 import net.md_5.bungee.api.CommandSender;
@@ -26,7 +26,7 @@ public class Maintenance extends Command {
         Event event = MainBungee.getEvent();
         if (args[0].equalsIgnoreCase("off")) {
             event.setMaintenanceDate(event.getStartDate());
-            EventManager.updateMaintenance(event);
+            EventsManager.updateMaintenance(event);
             sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§cMaintenance disable."));
             return;
         } else if (args[0].equalsIgnoreCase("on")) args[0] = "5m";
@@ -38,7 +38,7 @@ public class Maintenance extends Command {
         }
         event.setMaintenanceDate(new Date(time));
         switchOn(event);
-        EventManager.updateMaintenance(event);
+        EventsManager.updateMaintenance(event);
         sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.core.messages.maintenance.enabled")));
     }
 

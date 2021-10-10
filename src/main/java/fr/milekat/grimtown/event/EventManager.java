@@ -2,13 +2,12 @@ package fr.milekat.grimtown.event;
 
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.event.classes.Event;
-import fr.milekat.grimtown.event.manager.EventManager;
 
-public class ThisEvent {
+public class EventManager {
     private final Event event;
 
-    public ThisEvent() {
-        event = EventManager.getEvent(MainBungee.getConfig().getString("core.event"));
+    public EventManager(Event event) {
+        this.event = event;
         MainBungee.info("Loaded event '" + event.getName() + "' successfully.");
         loadFeatures();
     }
@@ -29,9 +28,5 @@ public class ThisEvent {
         if (event.getEventFeatures().contains(Event.EventFeature.CITE)) {
 
         }
-    }
-
-    public Event getEvent() {
-        return this.event;
     }
 }

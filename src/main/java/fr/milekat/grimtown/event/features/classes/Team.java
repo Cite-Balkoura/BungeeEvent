@@ -17,6 +17,7 @@ public class Team {
     private ObjectId id;
     @Indexed(options = @IndexOptions(unique = true))
     private String teamName;
+    private String eventName;
     @Indexed(options = @IndexOptions(unique = true))
     private ArrayList<UUID> members;
 

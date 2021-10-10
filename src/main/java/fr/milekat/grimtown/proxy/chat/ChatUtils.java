@@ -48,16 +48,7 @@ public class ChatUtils {
      */
     public static void sendNewAnnounce(String announce, Profile sender) {
         announce = ChatColor.translateAlternateColorCodes('&', announce.replace("\\n", System.lineSeparator()));
-        try {
-            RabbitMQ.rabbitSend(String.format("""
-                {
-                    "type": "announceEvent",
-                    "event": "%s",
-                    "message": "%s"
-                }""", MainBungee.getEvent().getName(), ChatColor.stripColor(announce)));
-        } catch (IOException | TimeoutException exception) {
-            exception.printStackTrace();
-        }
+        sendDiscord("Announce » " + announce);
         MainBungee.log("Announce » " + ChatColor.stripColor(announce));
         StringBuilder prettyAnnounce = new StringBuilder();
         for (String splitLines : announce.split("\\r?\\n")) {
@@ -145,17 +136,7 @@ public class ChatUtils {
         receivers.remove(ProxyServer.getInstance().getPlayer(message.getSender().getUuid()));
         sendConnection(message, receivers);
         ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
-            try {
-                RabbitMQ.rabbitSend(String.format("""
-                        {
-                            "type": "%s",
-                            "event": "%s",
-                            "message": "%s"
-                        }""", message.getType().toString(), MainBungee.getEvent().getName(),
-                        ChatColor.stripColor(message.getMessage())));
-            } catch (IOException | TimeoutException exception) {
-                exception.printStackTrace();
-            }
+            sendDiscord(message.getMessage());
             MessageManager.save(message);
             MainBungee.log(ChatColor.stripColor(message.getMessage()));
         });
@@ -179,17 +160,7 @@ public class ChatUtils {
             if (message.isMuted()) {
                 warnMute(ProxyServer.getInstance().getPlayer(uuid), MuteManager.getLastMute(message.getSender()));
             } else {
-                try {
-                    RabbitMQ.rabbitSend(String.format("""
-                            {
-                                "type": "chatEvent",
-                                "event": "%s",
-                                "sender": "%s",
-                                "message": "%s"
-                            }""", MainBungee.getEvent().getName(), profile.getUsername(), ChatColor.stripColor(strMessage)));
-                } catch (IOException | TimeoutException exception) {
-                    exception.printStackTrace();
-                }
+                sendDiscord("**" + profile.getUsername() + " »** " + message.getMessage());
             }
             MessageManager.save(message);
             MainBungee.log(ChatColor.stripColor("§r<" + profile.getUsername() + "§r> " + strMessage));
@@ -256,6 +227,19 @@ public class ChatUtils {
             }
         }
         return Chat;
+    }
+
+    /**
+     * Send message to Discord
+     */
+    private static void sendDiscord(String message) {
+        try {
+            RabbitMQ.rabbitSend(String.format("""
+                            {"type":"chatEvent","event":"%s","message":"%s"}""",
+                    MainBungee.getEvent().getName(), ChatColor.stripColor(message)));
+        } catch (IOException | TimeoutException exception) {
+            exception.printStackTrace();
+        }
     }
 
     /**
