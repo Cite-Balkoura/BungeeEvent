@@ -19,7 +19,7 @@ public class ChatTeam extends Command {
         if (!(sender instanceof ProxiedPlayer)) return;
         if (args.length > 0) {
             ChatUtils.sendNewChatTeam(TeamManager.getTeam(((ProxiedPlayer) sender).getUniqueId()),
-                    (ProxiedPlayer) sender, CoreUtils.getArgsText(0, args));
+                    ((ProxiedPlayer) sender).getUniqueId(), CoreUtils.getArgsText(0, args));
         } else sendHelp(sender);
     }
 

@@ -2,6 +2,7 @@ package fr.milekat.grimtown.proxy.chat.events;
 
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.event.features.classes.Team;
+import fr.milekat.grimtown.event.features.manager.TeamManager;
 import fr.milekat.grimtown.proxy.chat.ChatUtils;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
 import fr.milekat.grimtown.utils.RabbitMQReceive;
@@ -11,6 +12,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import org.bson.types.ObjectId;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -32,7 +34,7 @@ public class Chat implements Listener {
         event.setCancelled(true);
         ProxiedPlayer player = (ProxiedPlayer) event.getSender();
         if (CHAT_TEAM.containsKey(player)) {
-            ChatUtils.sendNewChatTeam(CHAT_TEAM.get(player), player, event.getMessage());
+            ChatUtils.sendNewChatTeam(CHAT_TEAM.get(player), player.getUniqueId(), event.getMessage());
         } else {
             String message = cleanMessages(event.getMessage(), player.getUniqueId());
             if (message != null) ChatUtils.sendNewGlobal(player.getUniqueId(), message);
@@ -41,10 +43,17 @@ public class Chat implements Listener {
 
     @EventHandler
     public void onDiscordChat(RabbitMQReceive event) {
-        if (event.getType().equals(RabbitMQReceive.MessageType.chatEvent)) {
+        if (event.getType().equals(RabbitMQReceive.MessageType.chatGlobal)) {
             UUID uuid = UUID.fromString((String) event.getPayload().get("uuid"));
             String message = cleanMessages((String) event.getPayload().get("message"), uuid);
             if (message != null) ChatUtils.sendNewGlobal(uuid, message);
+            else MainBungee.warning("Wrong chatGlobal json: " + event.getPayload());
+        } else if (event.getType().equals(RabbitMQReceive.MessageType.chatTeam)) {
+            UUID uuid = UUID.fromString((String) event.getPayload().get("uuid"));
+            Team team = TeamManager.getTeam(new ObjectId((String) event.getPayload().get("teamId")));
+            String message = (String) event.getPayload().get("message");
+            if (team!=null && message!=null) ChatUtils.sendNewChatTeam(team, uuid, message);
+            else MainBungee.warning("Wrong chatTeam json: " + event.getPayload());
         }
     }
 

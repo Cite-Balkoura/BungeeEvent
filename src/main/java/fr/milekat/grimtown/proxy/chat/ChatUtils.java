@@ -48,7 +48,7 @@ public class ChatUtils {
      */
     public static void sendNewAnnounce(String announce, Profile sender) {
         announce = ChatColor.translateAlternateColorCodes('&', announce.replace("\\n", System.lineSeparator()));
-        sendDiscord("Announce » " + announce);
+        sendGlobalDiscord("Announce » " + announce);
         MainBungee.log("Announce » " + ChatColor.stripColor(announce));
         StringBuilder prettyAnnounce = new StringBuilder();
         for (String splitLines : announce.split("\\r?\\n")) {
@@ -107,10 +107,14 @@ public class ChatUtils {
     /**
      * Create and send a team message
      */
-    public static void sendNewChatTeam(Team team, ProxiedPlayer player, String msg) {
-        Message message = new Message(msg, ProfileManager.getProfile(player), team);
+    public static void sendNewChatTeam(Team team, UUID uuid, String msg) {
+        Profile sender = ProfileManager.getProfile(uuid);
+        Message message = new Message(msg, sender, team);
         sendChatTeam(message, ProxyServer.getInstance().getPlayers());
-        ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> MessageManager.save(message));
+        ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
+            sendDiscordTeam(team, "**[Team] " + sender.getUsername() + " » **" + message.getMessage());
+            MessageManager.save(message);
+        });
     }
 
     /**
@@ -123,7 +127,7 @@ public class ChatUtils {
                         "§a[Team]§r " + message.getSender().getUsername() + " §b»§r " + message.getMessage()));
             } else if (player.hasPermission("mods.chat.team.see")) {
                 player.sendMessage(message.getSender().getUuid(), new TextComponent("§a[" + message.getTeam().getTeamName()
-                        + "]§r " + message.getSender().getUsername() + " §b»§r " + message));
+                        + "]§r " + message.getSender().getUsername() + " §b»§r " + message.getMessage()));
             }
         });
     }
@@ -136,7 +140,7 @@ public class ChatUtils {
         receivers.remove(ProxyServer.getInstance().getPlayer(message.getSender().getUuid()));
         sendConnection(message, receivers);
         ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
-            sendDiscord(message.getMessage());
+            sendGlobalDiscord(message.getMessage());
             MessageManager.save(message);
             MainBungee.log(ChatColor.stripColor(message.getMessage()));
         });
@@ -160,7 +164,7 @@ public class ChatUtils {
             if (message.isMuted()) {
                 warnMute(ProxyServer.getInstance().getPlayer(uuid), MuteManager.getLastMute(message.getSender()));
             } else {
-                sendDiscord("**" + profile.getUsername() + " »** " + message.getMessage());
+                sendGlobalDiscord("**" + profile.getUsername() + " »** " + message.getMessage());
             }
             MessageManager.save(message);
             MainBungee.log(ChatColor.stripColor("§r<" + profile.getUsername() + "§r> " + strMessage));
@@ -231,12 +235,34 @@ public class ChatUtils {
 
     /**
      * Send message to Discord
+     * {
+     *     "type": "chatGlobal",
+     *     "event": "MainBungee.getEvent().getName()",
+     *     "message": "Message content"
+     * }
      */
-    private static void sendDiscord(String message) {
+    private static void sendGlobalDiscord(String message) {
         try {
-            RabbitMQ.rabbitSend(String.format("""
-                            {"type":"chatEvent","event":"%s","message":"%s"}""",
+            RabbitMQ.rabbitSend(String.format("{\"type\":\"chatGlobal\",\"event\":\"%s\",\"message\":\"%s\"}",
                     MainBungee.getEvent().getName(), ChatColor.stripColor(message)));
+        } catch (IOException | TimeoutException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    /**
+     * Send message to Discord
+     * {
+     *     "type": "chatGlobal" or "chatTeam",
+     *     "event": "MainBungee.getEvent().getName()",
+     *     "teamId": "teamId, id of receiver team",
+     *     "message": "Message content"
+     * }
+     */
+    private static void sendDiscordTeam(Team team, String message) {
+        try {
+            RabbitMQ.rabbitSend(String.format("{\"type\":\"chatTeam\",\"event\":\"%s\",\"teamId\":\"%s\",\"message\":\"%s\"}",
+                    MainBungee.getEvent().getName(), team.getId(), ChatColor.stripColor(message)));
         } catch (IOException | TimeoutException exception) {
             exception.printStackTrace();
         }

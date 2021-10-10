@@ -1,11 +1,13 @@
 package fr.milekat.grimtown.proxy.chat.commands;
 
 import fr.milekat.grimtown.MainBungee;
+import fr.milekat.grimtown.event.classes.Event;
 import fr.milekat.grimtown.event.features.classes.Team;
 import fr.milekat.grimtown.event.features.manager.TeamManager;
 import fr.milekat.grimtown.proxy.chat.ChatManager;
 import fr.milekat.grimtown.proxy.chat.ChatUtils;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
+import fr.milekat.grimtown.proxy.core.classes.Profile;
 import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import fr.milekat.grimtown.utils.McTools;
 import net.md_5.bungee.api.CommandSender;
@@ -29,7 +31,6 @@ public class ChatMode extends Command implements TabExecutor {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!(sender instanceof ProxiedPlayer)) return;
-        MainBungee.log(args.length + "");
         if (args.length==1 && args[0].equalsIgnoreCase("all")) {
             CHAT_TEAM.remove(((ProxiedPlayer) sender));
             sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.chat.messages.mode.all")));
@@ -41,19 +42,25 @@ public class ChatMode extends Command implements TabExecutor {
                 ChatManager.getMods().remove((ProxiedPlayer) sender);
                 sender.sendMessage(new TextComponent("Mods disable"));
             }
-            sender.sendMessage(new TextComponent(new TextComponent(new String(new char[15]).replace("\0", "\n"))));
+            sender.sendMessage(new TextComponent(new String(new char[15]).replace("\0", "\n")));
             ChatUtils.sendMessages(15, Collections.singleton((ProxiedPlayer) sender));
-        } else if (args.length>=1 && args[0].equalsIgnoreCase("team")) {
+        } else if (args.length>=1 && MainBungee.getEvent().getEventFeatures().contains(Event.EventFeature.TEAM)
+                && args[0].equalsIgnoreCase("team")) {
             Team team = null;
             if (args.length==1) {
                 team = TeamManager.getTeam(((ProxiedPlayer) sender).getUniqueId());
             } else if (sender.hasPermission("mods.chat.team.other")) {
-                team = TeamManager.getTeam(ProfileManager.getProfile(args[1]));
+                Profile profile = ProfileManager.getProfile(args[1]);
+                if (profile==null) {
+                    sender.sendMessage(new TextComponent("§6Unknown player"));
+                    return;
+                }
+                team = TeamManager.getTeam(profile);
             }
-            if (team == null) {
+            if (team != null) {
+                CHAT_TEAM.put(((ProxiedPlayer) sender), team);
                 sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.chat.messages.mode.team")));
             } else {
-                CHAT_TEAM.put(((ProxiedPlayer) sender), team);
                 sender.sendMessage(new TextComponent(CoreUtils.getString("proxy.core.messages.no_team")));
             }
         } else {
@@ -67,17 +74,19 @@ public class ChatMode extends Command implements TabExecutor {
     private void sendHelp(CommandSender sender){
         sender.sendMessage(new TextComponent(MainBungee.PREFIX + "§6" + getClass().getSimpleName()));
         sender.sendMessage(new TextComponent("§6/chat all:§r Passe votre chat en mode général."));
-        sender.sendMessage(new TextComponent("§6/chat team:§r Passe votre chat en mode équipe."));
+        if (MainBungee.getEvent().getEventFeatures().contains(Event.EventFeature.TEAM))
+            sender.sendMessage(new TextComponent("§6/chat team:§r Passe votre chat en mode équipe."));
         if (sender.hasPermission("mods.chat.mods")) sender.sendMessage(new TextComponent("§6/chat mods <on/off>"));
     }
 
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
         if (args.length <= 1) {
-            if (sender.hasPermission("mods.chat.mods")) {
-                return McTools.getTabArgs(args[0], new ArrayList<>(Arrays.asList("all", "team", "mods")));
-            } else return McTools.getTabArgs(args[0], new ArrayList<>(Arrays.asList("all", "team")));
-        } else if (args.length <= 2 && args[0].equalsIgnoreCase("mods")) {
+            ArrayList<String> output = new ArrayList<>(Collections.singleton("all"));
+            if (MainBungee.getEvent().getEventFeatures().contains(Event.EventFeature.TEAM)) output.add("team");
+            if (sender.hasPermission("mods.chat.mods")) output.add("mods");
+            return McTools.getTabArgs(args[0], output);
+        } else if (args.length <= 2 && sender.hasPermission("mods.chat.mods") && args[0].equalsIgnoreCase("mods")) {
             return McTools.getTabArgs(args[1], new ArrayList<>(Arrays.asList("on", "off")));
         }
         return new ArrayList<>();

@@ -59,6 +59,10 @@ public class RabbitMQ {
                     if (MainBungee.DEBUG_RABBIT) MainBungee.log(new String(message.getBody(), StandardCharsets.UTF_8));
                     try {
                         JSONObject json = (JSONObject) new JSONParser().parse(new String(message.getBody(), StandardCharsets.UTF_8));
+                        if (json.containsKey("event") && !json.get("event").equals(MainBungee.getEvent().getName())) {
+                            // TODO: 11/10/2021 Disable AutoAck if payload event did not match !
+                            return;
+                        }
                         RabbitMQReceive.MessageType messageType = RabbitMQReceive.MessageType.other;
                         String type = (String) Optional.ofNullable(json.get("type")).orElse("other");
                         try {
@@ -73,6 +77,7 @@ public class RabbitMQ {
                     }
                 };
                 Channel channel = getConnection().createChannel();
+                // TODO: 11/10/2021 Disable AutoAck if payload event did not match !
                 channel.basicConsume(MainBungee.getConfig().getString("data.rabbitMQ.consumer.queue"),
                         true, deliverCallback, MainBungee::log);
             } catch (IOException | TimeoutException exception) {

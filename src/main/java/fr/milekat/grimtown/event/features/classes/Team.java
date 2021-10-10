@@ -15,13 +15,16 @@ import java.util.UUID;
 public class Team {
     @Id
     private ObjectId id;
-    @Indexed(options = @IndexOptions(unique = true))
+    @Indexed(options = @IndexOptions(unique = true, sparse = true))
     private String teamName;
-    private String eventName;
-    @Indexed(options = @IndexOptions(unique = true))
+    @Indexed(options = @IndexOptions(unique = true, sparse = true))
     private ArrayList<UUID> members;
 
     public Team() {}
+
+    public ObjectId getId() {
+        return id;
+    }
 
     public String getTeamName() {
         return teamName;
