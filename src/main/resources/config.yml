@@ -20,8 +20,8 @@ data:
     password : "admin"
     exchange : "minecraft"
     consumer:
-      queue: "bot-output"
-      routingKey: "bot-output"
+      queue: "not-used"
+      routingKey: "not-used"
     publisher:
       queue: "bot-input"
       routingKey: "bot-input"

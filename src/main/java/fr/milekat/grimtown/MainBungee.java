@@ -38,6 +38,11 @@ public class MainBungee extends Plugin {
         data.loadConfigs();
         /* MongoDB */
         datastoreMap = MongoDB.getDatastoreMap(config);
+        /* Event load */
+        mcEvent = EventsManager.getEvent(mainBungee.config.getString("core.event"));
+        new EventManager(mcEvent);
+        /* Master load */
+        new ProxyManager(this, ProxyServer.getInstance().getPluginManager());
         /* RabbitMQ */
         try {
             new RabbitMQ().getRabbitConsumer().start();
@@ -45,11 +50,6 @@ public class MainBungee extends Plugin {
             warning("RabbitMQ consumer error ! RabbitMQ disabled");
             exception.printStackTrace();
         }
-        /* Event load */
-        mcEvent = EventsManager.getEvent(mainBungee.config.getString("core.event"));
-        new EventManager(mcEvent);
-        /* Master load */
-        new ProxyManager(this, ProxyServer.getInstance().getPluginManager());
         if (DEBUG_ERRORS) log("Debugs enable, plugin loaded");
     }
 

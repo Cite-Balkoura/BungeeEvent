@@ -20,11 +20,14 @@ public class RabbitMQ {
         try {
             Channel channel = getConnection().createChannel();
             channel.exchangeDeclare(MainBungee.getConfig().getString("data.rabbitMQ.exchange"), "direct");
-            channel.queueDeclare(MainBungee.getConfig().getString("data.rabbitMQ.consumer.queue"),
+            channel.queueDeclare("consumer_" + MainBungee.getEvent().getDatabase(),
                     false, false, false, null);
-            channel.queueBind(MainBungee.getConfig().getString("data.rabbitMQ.consumer.queue"),
+            channel.queueBind("consumer_" + MainBungee.getEvent().getDatabase(),
                     MainBungee.getConfig().getString("data.rabbitMQ.exchange"),
-                    MainBungee.getConfig().getString("data.rabbitMQ.consumer.routingKey"));
+                    "prod.bungee.all");
+            channel.queueBind("consumer_" + MainBungee.getEvent().getDatabase(),
+                    MainBungee.getConfig().getString("data.rabbitMQ.exchange"),
+                    "prod.bungee." + MainBungee.getEvent().getDatabase());
             channel.queueDeclare(MainBungee.getConfig().getString("data.rabbitMQ.publisher.queue"),
                     false, false, false, null);
             channel.queueBind(MainBungee.getConfig().getString("data.rabbitMQ.publisher.queue"),
@@ -50,19 +53,16 @@ public class RabbitMQ {
     }
 
     /**
-     * Load RABBIT_CONFIG.get("queue") Consumer
+     * Load prod.bungee.%eventName% Consumer
      */
     public Thread getRabbitConsumer() throws IOException {
         return new Thread(() -> {
             try {
+                Channel channel = getConnection().createChannel();
                 DeliverCallback deliverCallback = (consumerTag, message) -> {
                     if (MainBungee.DEBUG_RABBIT) MainBungee.log(new String(message.getBody(), StandardCharsets.UTF_8));
                     try {
                         JSONObject json = (JSONObject) new JSONParser().parse(new String(message.getBody(), StandardCharsets.UTF_8));
-                        if (json.containsKey("event") && !json.get("event").equals(MainBungee.getEvent().getName())) {
-                            // TODO: 11/10/2021 Disable AutoAck if payload event did not match !
-                            return;
-                        }
                         RabbitMQReceive.MessageType messageType = RabbitMQReceive.MessageType.other;
                         String type = (String) Optional.ofNullable(json.get("type")).orElse("other");
                         try {
@@ -76,10 +76,8 @@ public class RabbitMQ {
                         exception.printStackTrace();
                     }
                 };
-                Channel channel = getConnection().createChannel();
-                // TODO: 11/10/2021 Disable AutoAck if payload event did not match !
-                channel.basicConsume(MainBungee.getConfig().getString("data.rabbitMQ.consumer.queue"),
-                        true, deliverCallback, MainBungee::log);
+                channel.basicConsume("consumer_" + MainBungee.getEvent().getDatabase(), true, deliverCallback,
+                        MainBungee::log);
             } catch (IOException | TimeoutException exception) {
                 exception.printStackTrace();
             }
@@ -90,6 +88,7 @@ public class RabbitMQ {
      * Send message through RABBIT_CONFIG.get("routingKey") queue
      */
     public static void rabbitSend(String message) throws IOException, TimeoutException {
+        //if (MainBungee.getEvent().getStartDate().after(new Date()) || MainBungee.getEvent().getEndDate().before(new Date())) return;
         Channel channel = getConnection().createChannel();
         channel.basicPublish(MainBungee.getConfig().getString("data.rabbitMQ.exchange"),
                 MainBungee.getConfig().getString("data.rabbitMQ.publisher.routingKey"),

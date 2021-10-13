@@ -2,8 +2,8 @@ package fr.milekat.grimtown.proxy.moderation.commands;
 
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
+import fr.milekat.grimtown.proxy.moderation.ModerationUtils;
 import fr.milekat.grimtown.utils.McTools;
-import fr.milekat.grimtown.utils.RabbitMQ;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -11,9 +11,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 public class Kick extends Command implements TabExecutor {
@@ -35,20 +33,8 @@ public class Kick extends Command implements TabExecutor {
             }
             target.disconnect(new TextComponent(MainBungee.getConfig().getString("connection.kick")
                     .replaceAll("@reason", CoreUtils.getArgsText(1, args))));
-            try {
-                RabbitMQ.rabbitSend(String.format("""
-                        {
-                            "type": "kick",
-                            "target": "%s",
-                            "sender": "%s",
-                            "reason": "%s"
-                        }""", target.getUniqueId(),
-                        ((ProxiedPlayer) sender).getUniqueId(),
-                        CoreUtils.getArgsText(1, args)));
-            } catch (IOException | TimeoutException exception) {
-                MainBungee.warning("[Error] RabbitSend - kick");
-                if (MainBungee.DEBUG_ERRORS) exception.printStackTrace();
-            }
+            ModerationUtils.rabbitSend("kick", target.getUniqueId().toString(),
+                    ((ProxiedPlayer) sender).getUniqueId().toString(), null, CoreUtils.getArgsText(1, args));
         } else {
             sendHelp(sender);
         }
