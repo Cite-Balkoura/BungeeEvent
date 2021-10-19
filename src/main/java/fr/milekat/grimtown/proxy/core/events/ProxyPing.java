@@ -2,6 +2,7 @@ package fr.milekat.grimtown.proxy.core.events;
 
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
+import fr.milekat.utils.DateMileKat;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -19,22 +20,24 @@ public class ProxyPing implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void proxyPing(ProxyPingEvent event) {
         ServerPing ping = event.getResponse();
-        if (MainBungee.getEvent().getStartDate().getTime() > new Date().getTime()) {
+        if (new Date().before(MainBungee.getEvent().getStartDate())) {
             ping.setDescriptionComponent(new TextComponent(CoreUtils.getString("proxy.motd.before.motd")));
             ping.getVersion().setProtocol(MainBungee.getConfig().getInt("proxy.motd.before.protocol"));
             ping.getVersion().setName(CoreUtils.getString("proxy.motd.before.ping_msg"));
             ArrayList<ServerPing.PlayerInfo> samples = new ArrayList<>();
             Arrays.stream(CoreUtils.getString("proxy.motd.before.ping_hover").split("\\n")).forEach(s ->
-                    samples.add(new ServerPing.PlayerInfo(s, ""))
+                    samples.add(new ServerPing.PlayerInfo(s.replaceAll("<EVENT_TIME>",
+                            DateMileKat.reamingToString(MainBungee.getEvent().getStartDate())), ""))
             );
             ping.getPlayers().setSample(samples.toArray(new ServerPing.PlayerInfo[0]));
-        } else if (MainBungee.getEvent().getMaintenanceDate().getTime() > new Date().getTime()) {
+        } else if (new Date().before(MainBungee.getEvent().getMaintenanceDate())) {
             ping.setDescriptionComponent(new TextComponent(CoreUtils.getString("proxy.motd.maintenance.motd")));
             ping.getVersion().setProtocol(MainBungee.getConfig().getInt("proxy.motd.maintenance.protocol"));
             ping.getVersion().setName(CoreUtils.getString("proxy.motd.maintenance.ping_msg"));
             ArrayList<ServerPing.PlayerInfo> samples = new ArrayList<>();
             Arrays.stream(CoreUtils.getString("proxy.motd.maintenance.ping_hover").split("\\n")).forEach(s ->
-                    samples.add(new ServerPing.PlayerInfo(s, ""))
+                    samples.add(new ServerPing.PlayerInfo(s.replaceAll("<MAINTENANCE_TIME>",
+                            DateMileKat.reamingToString(MainBungee.getEvent().getStartDate())), ""))
             );
             ping.getPlayers().setSample(samples.toArray(new ServerPing.PlayerInfo[0]));
         } else {
