@@ -1,10 +1,10 @@
-package fr.milekat.grimtown.event.manager;
+package fr.milekat.grimtown.proxy.core.manager;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filters;
 import dev.morphia.query.experimental.updates.UpdateOperators;
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.classes.Event;
+import fr.milekat.grimtown.proxy.core.classes.Event;
 
 import java.util.ArrayList;
 

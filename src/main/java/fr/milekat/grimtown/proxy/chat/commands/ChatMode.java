@@ -1,12 +1,12 @@
 package fr.milekat.grimtown.proxy.chat.commands;
 
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.classes.Event;
-import fr.milekat.grimtown.event.features.classes.Team;
-import fr.milekat.grimtown.event.features.manager.TeamManager;
 import fr.milekat.grimtown.proxy.chat.ChatManager;
 import fr.milekat.grimtown.proxy.chat.ChatUtils;
+import fr.milekat.grimtown.proxy.chat.classes.Team;
+import fr.milekat.grimtown.proxy.chat.manager.TeamManager;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
+import fr.milekat.grimtown.proxy.core.classes.Event;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
 import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import fr.milekat.grimtown.utils.McTools;

@@ -1,9 +1,9 @@
-package fr.milekat.grimtown.event.features.manager;
+package fr.milekat.grimtown.proxy.chat.manager;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filters;
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.features.classes.Team;
+import fr.milekat.grimtown.proxy.chat.classes.Team;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
 import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import org.bson.types.ObjectId;

@@ -1,13 +1,13 @@
 package fr.milekat.grimtown.proxy.chat;
 
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.classes.Event;
-import fr.milekat.grimtown.event.features.classes.Team;
+import fr.milekat.grimtown.proxy.chat.classes.Team;
 import fr.milekat.grimtown.proxy.chat.commands.*;
 import fr.milekat.grimtown.proxy.chat.engine.Announcement;
 import fr.milekat.grimtown.proxy.chat.engine.Spam;
 import fr.milekat.grimtown.proxy.chat.events.Chat;
 import fr.milekat.grimtown.proxy.chat.events.Connect;
+import fr.milekat.grimtown.proxy.core.classes.Event;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;

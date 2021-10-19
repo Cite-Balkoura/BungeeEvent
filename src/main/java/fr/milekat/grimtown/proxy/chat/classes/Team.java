@@ -1,4 +1,4 @@
-package fr.milekat.grimtown.event.features.classes;
+package fr.milekat.grimtown.proxy.chat.classes;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;

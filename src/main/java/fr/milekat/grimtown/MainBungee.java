@@ -1,10 +1,9 @@
 package fr.milekat.grimtown;
 
 import dev.morphia.Datastore;
-import fr.milekat.grimtown.event.EventManager;
-import fr.milekat.grimtown.event.classes.Event;
-import fr.milekat.grimtown.event.manager.EventsManager;
 import fr.milekat.grimtown.proxy.ProxyManager;
+import fr.milekat.grimtown.proxy.core.classes.Event;
+import fr.milekat.grimtown.proxy.core.manager.EventsManager;
 import fr.milekat.grimtown.utils.ConfigManager;
 import fr.milekat.grimtown.utils.MongoDB;
 import fr.milekat.grimtown.utils.RabbitMQ;
@@ -40,7 +39,6 @@ public class MainBungee extends Plugin {
         datastoreMap = MongoDB.getDatastoreMap(config);
         /* Event load */
         mcEvent = EventsManager.getEvent(mainBungee.config.getString("core.event"));
-        new EventManager(mcEvent);
         /* Master load */
         new ProxyManager(this, ProxyServer.getInstance().getPluginManager());
         /* RabbitMQ */

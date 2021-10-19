@@ -1,8 +1,8 @@
 package fr.milekat.grimtown.proxy.chat.commands;
 
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.features.manager.TeamManager;
 import fr.milekat.grimtown.proxy.chat.ChatUtils;
+import fr.milekat.grimtown.proxy.chat.manager.TeamManager;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;

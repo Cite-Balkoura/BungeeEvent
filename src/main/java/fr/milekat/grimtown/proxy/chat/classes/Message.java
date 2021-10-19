@@ -3,7 +3,6 @@ package fr.milekat.grimtown.proxy.chat.classes;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.mapping.experimental.MorphiaReference;
-import fr.milekat.grimtown.event.features.classes.Team;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
 import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import fr.milekat.grimtown.proxy.moderation.managers.MuteManager;

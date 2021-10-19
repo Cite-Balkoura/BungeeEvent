@@ -1,9 +1,9 @@
 package fr.milekat.grimtown.proxy.moderation.commands;
 
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.classes.Event;
-import fr.milekat.grimtown.event.manager.EventsManager;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
+import fr.milekat.grimtown.proxy.core.classes.Event;
+import fr.milekat.grimtown.proxy.core.manager.EventsManager;
 import fr.milekat.utils.DateMileKat;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;

@@ -1,7 +1,7 @@
 package fr.milekat.grimtown.proxy.core;
 
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.classes.Event;
+import fr.milekat.grimtown.proxy.core.classes.Event;
 import fr.milekat.grimtown.proxy.moderation.classes.Ban;
 import fr.milekat.grimtown.proxy.moderation.classes.Mute;
 import fr.milekat.utils.DateMileKat;

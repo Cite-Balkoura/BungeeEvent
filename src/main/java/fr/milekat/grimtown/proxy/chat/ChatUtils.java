@@ -1,8 +1,8 @@
 package fr.milekat.grimtown.proxy.chat;
 
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.features.classes.Team;
 import fr.milekat.grimtown.proxy.chat.classes.Message;
+import fr.milekat.grimtown.proxy.chat.classes.Team;
 import fr.milekat.grimtown.proxy.chat.manager.MessageManager;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
@@ -22,6 +22,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
@@ -62,7 +63,10 @@ public class ChatUtils {
         if (sender==null) message = new Message(prettyAnnounce.toString());
         else message = new Message(Message.Type.announce, prettyAnnounce.toString(), sender);
         sendAnnounce(message, ProxyServer.getInstance().getPlayers());
-        ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> MessageManager.save(message));
+        ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
+            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
+                MessageManager.save(message);
+        });
     }
 
     /**
@@ -83,7 +87,10 @@ public class ChatUtils {
         msg = ChatColor.translateAlternateColorCodes('&', msg);
         Message message = new Message(msg, ProfileManager.getProfile(sender), ProfileManager.getProfile(receiver));
         sendPrivate(message, ProxyServer.getInstance().getPlayers());
-        ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> MessageManager.save(message));
+        ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
+            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
+                MessageManager.save(message);
+        });
     }
 
     /**
@@ -113,7 +120,8 @@ public class ChatUtils {
         sendChatTeam(message, ProxyServer.getInstance().getPlayers());
         ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
             sendDiscordTeam(team, "**[Team] " + sender.getUsername() + " » **" + message.getMessage());
-            MessageManager.save(message);
+            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
+                MessageManager.save(message);
         });
     }
 
@@ -141,7 +149,8 @@ public class ChatUtils {
         sendConnection(message, receivers);
         ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
             sendGlobalDiscord(message.getMessage());
-            MessageManager.save(message);
+            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
+                MessageManager.save(message);
             MainBungee.log(ChatColor.stripColor(message.getMessage()));
         });
     }
@@ -166,7 +175,8 @@ public class ChatUtils {
             } else {
                 sendGlobalDiscord("**" + profile.getUsername() + " »** " + message.getMessage());
             }
-            MessageManager.save(message);
+            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
+                MessageManager.save(message);
             MainBungee.log(ChatColor.stripColor("§r<" + profile.getUsername() + "§r> " + strMessage));
         });
     }

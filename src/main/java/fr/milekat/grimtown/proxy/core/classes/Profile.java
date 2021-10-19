@@ -57,7 +57,7 @@ public class Profile {
         return registerDate;
     }
 
-    public boolean isStaff() {
-        return staff;
+    public boolean nonStaff() {
+        return !staff;
     }
 }

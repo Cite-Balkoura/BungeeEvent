@@ -12,6 +12,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
@@ -88,7 +89,7 @@ public class RabbitMQ {
      * Send message through RABBIT_CONFIG.get("routingKey") queue
      */
     public static void rabbitSend(String message) throws IOException, TimeoutException {
-        //if (MainBungee.getEvent().getStartDate().after(new Date()) || MainBungee.getEvent().getEndDate().before(new Date())) return;
+        if (!(MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))) return;
         Channel channel = getConnection().createChannel();
         channel.basicPublish(MainBungee.getConfig().getString("data.rabbitMQ.exchange"),
                 MainBungee.getConfig().getString("data.rabbitMQ.publisher.routingKey"),

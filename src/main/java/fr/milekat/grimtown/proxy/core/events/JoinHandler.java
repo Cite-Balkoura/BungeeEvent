@@ -1,8 +1,8 @@
 package fr.milekat.grimtown.proxy.core.events;
 
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.classes.Event;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
+import fr.milekat.grimtown.proxy.core.classes.Event;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
 import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import fr.milekat.grimtown.proxy.moderation.classes.Ban;
@@ -24,28 +24,28 @@ public class JoinHandler implements Listener {
      */
     @EventHandler
     public void onTryJoin(LoginEvent event) {
-        if (ProfileManager.notExists(event.getConnection().getUniqueId())) {
+        Profile profile = ProfileManager.getProfile(event.getConnection().getUniqueId());
+        if (profile==null) {
             event.setCancelReason(new TextComponent(CoreUtils.getString("proxy.login.not_register")));
             event.setCancelled(true);
             return;
         }
-        Profile profile = ProfileManager.getProfile(event.getConnection().getUniqueId());
         Event eventMc = MainBungee.getEvent();
         if (eventMc.getStartDate().getTime() > new Date().getTime()) {
-            if (!profile.isStaff()) {
+            if (profile.nonStaff()) {
                 event.setCancelReason(new TextComponent(CoreUtils.getString("proxy.login.not_started")));
                 event.setCancelled(true);
                 return;
             }
         }
         if (eventMc.getMaintenanceDate().getTime() > new Date().getTime()) {
-            if (!profile.isStaff()) {
+            if (profile.nonStaff()) {
                 event.setCancelReason(new TextComponent(CoreUtils.getString("proxy.login.maintenance")));
                 event.setCancelled(true);
                 return;
             }
         }
-        if (getNonStaff().size() >= MainBungee.getConfig().getInt("proxy.core.max_players")) {
+        if (profile.nonStaff() && getNonStaff().size() >= MainBungee.getConfig().getInt("proxy.core.max_players")) {
             event.setCancelReason(new TextComponent(CoreUtils.getString("proxy.login.full")));
             event.setCancelled(true);
             return;
@@ -63,30 +63,6 @@ public class JoinHandler implements Listener {
                 ProfileManager.updateUsername(event.getPlayer().getUniqueId(), event.getPlayer().getName())
         );
     }
-
-    /*  Send player to his last server
-    @EventHandler
-    public void onJoinEvent(ServerConnectEvent event) {
-        if (!event.getTarget().getName().equalsIgnoreCase("event")) return;
-        if (event.getPlayer().hasPermission("mods.event.connect.bypass")) return;
-        try {
-            Connection connection = MainBungee.getSql();
-            PreparedStatement q = connection.prepareStatement("SELECT `value` FROM `mcpg_config` WHERE `name` = ?;");
-            q.setString(1, "EVENT");
-            q.execute();
-            q.getResultSet().next();
-            if (!q.getResultSet().getBoolean("value")) {
-                if (event.getPlayer().getServer() != null) {
-                    event.setCancelled(true);
-                } else {
-                    event.setTarget(ProxyServer.getInstance().getServerInfo("cite"));
-                }
-            }
-        } catch (SQLException throwable) {
-            throwable.printStackTrace();
-        }
-    }
-     */
 
     /**
      *

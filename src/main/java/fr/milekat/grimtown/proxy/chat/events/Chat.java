@@ -1,9 +1,9 @@
 package fr.milekat.grimtown.proxy.chat.events;
 
 import fr.milekat.grimtown.MainBungee;
-import fr.milekat.grimtown.event.features.classes.Team;
-import fr.milekat.grimtown.event.features.manager.TeamManager;
 import fr.milekat.grimtown.proxy.chat.ChatUtils;
+import fr.milekat.grimtown.proxy.chat.classes.Team;
+import fr.milekat.grimtown.proxy.chat.manager.TeamManager;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
 import fr.milekat.grimtown.utils.RabbitMQReceive;
 import net.md_5.bungee.api.ProxyServer;
