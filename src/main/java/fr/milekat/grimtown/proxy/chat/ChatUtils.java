@@ -22,7 +22,6 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
@@ -64,8 +63,7 @@ public class ChatUtils {
         else message = new Message(Message.Type.announce, prettyAnnounce.toString(), sender);
         sendAnnounce(message, ProxyServer.getInstance().getPlayers());
         ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
-            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
-                MessageManager.save(message);
+            if (MainBungee.getEvent().isRunning()) MessageManager.save(message);
         });
     }
 
@@ -88,8 +86,7 @@ public class ChatUtils {
         Message message = new Message(msg, ProfileManager.getProfile(sender), ProfileManager.getProfile(receiver));
         sendPrivate(message, ProxyServer.getInstance().getPlayers());
         ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
-            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
-                MessageManager.save(message);
+            if (MainBungee.getEvent().isRunning()) MessageManager.save(message);
         });
     }
 
@@ -120,8 +117,7 @@ public class ChatUtils {
         sendChatTeam(message, ProxyServer.getInstance().getPlayers());
         ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
             sendDiscordTeam(team, "**[Team] " + sender.getUsername() + " » **" + message.getMessage());
-            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
-                MessageManager.save(message);
+            if (MainBungee.getEvent().isRunning()) MessageManager.save(message);
         });
     }
 
@@ -149,8 +145,7 @@ public class ChatUtils {
         sendConnection(message, receivers);
         ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), ()-> {
             sendGlobalDiscord(message.getMessage());
-            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
-                MessageManager.save(message);
+            if (MainBungee.getEvent().isRunning()) MessageManager.save(message);
             MainBungee.log(ChatColor.stripColor(message.getMessage()));
         });
     }
@@ -159,7 +154,7 @@ public class ChatUtils {
      * Send connection message to all players
      */
     public static void sendConnection(Message message, Collection<ProxiedPlayer> receivers) {
-        receivers.forEach(player -> player.sendMessage(new TextComponent(message.getMessage())));
+        receivers.forEach(player -> player.sendMessage(new TextComponent(MainBungee.PREFIX + message.getMessage())));
     }
 
     /**
@@ -175,9 +170,8 @@ public class ChatUtils {
             } else {
                 sendGlobalDiscord("**" + profile.getUsername() + " »** " + message.getMessage());
             }
-            if (MainBungee.getEvent().getStartDate().after(new Date()) && MainBungee.getEvent().getEndDate().before(new Date()))
-                MessageManager.save(message);
-            MainBungee.log(ChatColor.stripColor("§r<" + profile.getUsername() + "§r> " + strMessage));
+            if (MainBungee.getEvent().isRunning()) MessageManager.save(message);
+            MainBungee.log("§r<" + profile.getUsername() + "§r> " + strMessage);
         });
     }
 
@@ -252,6 +246,7 @@ public class ChatUtils {
      * }
      */
     private static void sendGlobalDiscord(String message) {
+        if (!MainBungee.getEvent().isRunning()) return;
         try {
             RabbitMQ.rabbitSend(String.format("{\"type\":\"chatGlobal\",\"event\":\"%s\",\"message\":\"%s\"}",
                     MainBungee.getEvent().getName(), ChatColor.stripColor(message)));
@@ -270,6 +265,7 @@ public class ChatUtils {
      * }
      */
     private static void sendDiscordTeam(Team team, String message) {
+        if (!MainBungee.getEvent().isRunning()) return;
         try {
             RabbitMQ.rabbitSend(String.format("{\"type\":\"chatTeam\",\"event\":\"%s\",\"teamId\":\"%s\",\"message\":\"%s\"}",
                     MainBungee.getEvent().getName(), team.getId(), ChatColor.stripColor(message)));
@@ -282,10 +278,10 @@ public class ChatUtils {
      * Send time before unMute
      */
     public static void warnMute(ProxiedPlayer player, Mute mute) {
-        TextComponent Mute = new TextComponent(CoreUtils.getString("proxy.chat.message.unMuteNotify.message")
+        TextComponent Mute = new TextComponent(CoreUtils.getString("proxy.chat.messages.unMuteNotify.message")
                 .replaceAll("<REAMING>", DateMileKat.reamingToString(mute.getPardonDate())));
         Mute.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(
-                MainBungee.getConfig().getString("proxy.chat.message.unMuteNotify.hover"))));
+                MainBungee.getConfig().getString("proxy.chat.messages.unMuteNotify.hover"))));
         player.sendMessage(Mute);
     }
 

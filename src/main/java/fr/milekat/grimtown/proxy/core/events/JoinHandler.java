@@ -2,7 +2,6 @@ package fr.milekat.grimtown.proxy.core.events;
 
 import fr.milekat.grimtown.MainBungee;
 import fr.milekat.grimtown.proxy.core.CoreUtils;
-import fr.milekat.grimtown.proxy.core.classes.Event;
 import fr.milekat.grimtown.proxy.core.classes.Profile;
 import fr.milekat.grimtown.proxy.core.manager.ProfileManager;
 import fr.milekat.grimtown.proxy.moderation.classes.Ban;
@@ -30,20 +29,15 @@ public class JoinHandler implements Listener {
             event.setCancelled(true);
             return;
         }
-        Event eventMc = MainBungee.getEvent();
-        if (eventMc.getStartDate().getTime() > new Date().getTime()) {
-            if (profile.nonStaff()) {
-                event.setCancelReason(new TextComponent(CoreUtils.getString("proxy.login.not_started")));
-                event.setCancelled(true);
-                return;
-            }
+        if (profile.nonStaff() && !MainBungee.getEvent().isRunning()) {
+            event.setCancelReason(new TextComponent(CoreUtils.getString("proxy.login.not_started")));
+            event.setCancelled(true);
+            return;
         }
-        if (eventMc.getMaintenanceDate().getTime() > new Date().getTime()) {
-            if (profile.nonStaff()) {
-                event.setCancelReason(new TextComponent(CoreUtils.getString("proxy.login.maintenance")));
-                event.setCancelled(true);
-                return;
-            }
+        if (profile.nonStaff() && MainBungee.getEvent().getMaintenanceDate().after(new Date())) {
+            event.setCancelReason(new TextComponent(CoreUtils.getString("proxy.login.maintenance")));
+            event.setCancelled(true);
+            return;
         }
         if (profile.nonStaff() && getNonStaff().size() >= MainBungee.getConfig().getInt("proxy.core.max_players")) {
             event.setCancelReason(new TextComponent(CoreUtils.getString("proxy.login.full")));
@@ -59,9 +53,10 @@ public class JoinHandler implements Listener {
 
     @EventHandler
     public void onJoinUpdateProfile(PostLoginEvent event) {
-        ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), () ->
-                ProfileManager.updateUsername(event.getPlayer().getUniqueId(), event.getPlayer().getName())
-        );
+        ProxyServer.getInstance().getScheduler().runAsync(MainBungee.getInstance(), () -> {
+            ProfileManager.updateUsername(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+            if (event.getPlayer().hasPermission("mods.staff")) ProfileManager.setStaff(event.getPlayer().getUniqueId());
+        });
     }
 
     /**

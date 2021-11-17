@@ -20,7 +20,7 @@ public class BanDiscord implements Listener {
 
     @EventHandler
     public void onDiscordUnBan(RabbitMQReceive event) {
-        if (event.getType().equals(RabbitMQReceive.MessageType.unban)) {
+        if (event.getType().equals(RabbitMQReceive.MessageType.unBan)) {
             ModerationUtils.unBan(UUID.fromString(String.valueOf(event.getPayload().get("target"))));
         }
     }

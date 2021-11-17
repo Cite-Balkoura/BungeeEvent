@@ -30,6 +30,7 @@ data:
 proxy:
   core:
     max_players: 150
+    early_open: 10  # In minutes
     messages:
       time_too_low: "<PREFIX>Please use a duration of 10s minimum."
       player_not_found: "<PREFIX>Can't find this player."

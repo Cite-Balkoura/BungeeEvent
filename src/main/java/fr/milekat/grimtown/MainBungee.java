@@ -7,6 +7,7 @@ import fr.milekat.grimtown.proxy.core.manager.EventsManager;
 import fr.milekat.grimtown.utils.ConfigManager;
 import fr.milekat.grimtown.utils.MongoDB;
 import fr.milekat.grimtown.utils.RabbitMQ;
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
@@ -56,9 +57,12 @@ public class MainBungee extends Plugin {
     /**
      * Console logging
      */
-    public static void log(String message) { ProxyServer.getInstance().getLogger().info(MainBungee.PREFIX + message); }
-    public static void info(String log) { ProxyServer.getInstance().getLogger().info(MainBungee.PREFIX + log); }
-    public static void warning(String log) { ProxyServer.getInstance().getLogger().warning(MainBungee.PREFIX + log); }
+    public static void log(String message)
+    { ProxyServer.getInstance().getLogger().info(ChatColor.stripColor(PREFIX + message)); }
+    public static void info(String log)
+    { ProxyServer.getInstance().getLogger().info(ChatColor.stripColor(PREFIX + log)); }
+    public static void warning(String log)
+    { ProxyServer.getInstance().getLogger().warning(ChatColor.stripColor(PREFIX + log)); }
 
     /**
      * Get loaded config shortcut

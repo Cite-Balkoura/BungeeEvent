@@ -14,9 +14,9 @@ public class RabbitMQReceive extends Event {
 
     public enum MessageType {
         mute,
-        unmute,
+        unMute,
         ban,
-        unban,
+        unBan,
         chatGlobal,
         chatTeam,
         other

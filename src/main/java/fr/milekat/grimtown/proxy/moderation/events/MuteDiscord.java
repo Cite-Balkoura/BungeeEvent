@@ -19,7 +19,7 @@ public class MuteDiscord implements Listener {
 
     @EventHandler
     public void onDiscordUnMute(RabbitMQReceive event) {
-        if (event.getType().equals(RabbitMQReceive.MessageType.unmute)) {
+        if (event.getType().equals(RabbitMQReceive.MessageType.unMute)) {
             ModerationUtils.unMute(UUID.fromString(String.valueOf(event.getPayload().get("target"))));
         }
     }

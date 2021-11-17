@@ -76,4 +76,14 @@ public class ProfileManager {
                 .update(UpdateOperators.set("username", username))
                 .execute();
     }
+
+    /**
+     * Save/Update a Profile
+     */
+    public static void setStaff(UUID uuid) {
+        DATASTORE.find(Profile.class)
+                .filter(Filters.eq("uuid", uuid))
+                .update(UpdateOperators.set("staff", true))
+                .execute();
+    }
 }

@@ -4,9 +4,11 @@ import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexed;
+import fr.milekat.grimtown.MainBungee;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity(value = "event")
@@ -63,7 +65,10 @@ public class Event {
         this.maintenanceDate = maintenanceDate;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public boolean isRunning() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        calendar.add(Calendar.MINUTE, -1 * (Integer) MainBungee.getConfig().get("proxy.core.early_open"));
+        return (calendar.getTime().before(new Date()) && endDate.after(new Date()));
     }
 }

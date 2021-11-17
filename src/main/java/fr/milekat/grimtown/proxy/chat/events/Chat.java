@@ -43,6 +43,7 @@ public class Chat implements Listener {
 
     @EventHandler
     public void onDiscordChat(RabbitMQReceive event) {
+        if (!MainBungee.getEvent().isRunning()) return;
         if (event.getType().equals(RabbitMQReceive.MessageType.chatGlobal)) {
             UUID uuid = UUID.fromString((String) event.getPayload().get("uuid"));
             String message = cleanMessages((String) event.getPayload().get("message"), uuid);
@@ -101,7 +102,7 @@ public class Chat implements Listener {
         String[] messages = message.split("\\s+");
         for (String word : messages) {
             if (MainBungee.getConfig().getList("proxy.chat.banned_words").contains(word.toLowerCase())) {
-                message = message.replace(word, word.replaceAll(".","*"));
+                message = message.replace(word, word.replaceAll(".*","*"));
             }
         }
         return message;
